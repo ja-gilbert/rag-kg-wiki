@@ -53,7 +53,7 @@ can explain**:
 | Who fixed the bug in the service that Atlas depends on? | graph | Three hops. No passage contains the join, so retrieval has nothing to retrieve. |
 | Which policy came out of the incident caused by the service that Beacon depends on? | graph | Same shape. Embeddings can't express a join. |
 | Which people are within two hops of INC-2041? | graph | "Within two hops" isn't a property of text. RAG can't even represent the question. |
-| A customer says the product feels sluggish. What should I check? | RAG | The runbook never uses the word "sluggish". Keyword search whiffs; embeddings don't. |
+| A customer says the product feels sluggish. What should I check? | RAG | Procedural knowledge, so the graph has no edge to walk. Both retrievers find the runbook here; re-ask it as "pages take forever to appear" and only embeddings do. |
 | How do the five services fit together and who owns what? | wiki | Answer spans eight documents. RAG returns five fragments each holding a fifth of it; the wiki already did the synthesis, offline. |
 | What has repeatedly gone wrong with our vendors? | wiki | Two vendors, two incidents, one policy, one standing rule. Pre-compiled and backlinked. |
 | **What was Meridian Systems' revenue last quarter?** | *none* | Not in the corpus. The honesty test — watch all three fail differently. |

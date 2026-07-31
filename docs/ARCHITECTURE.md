@@ -299,9 +299,13 @@ are deliberately scattered so that multi-hop questions are genuinely multi-hop.
 `bug-903.txt` says BUG-903 affects Ember and was fixed by Marcus Chen;
 `svc-atlas.txt` says Atlas depends on Ember. Three files, one three-hop question.
 
-The RAG-favouring questions work the same way in reverse. The slow-response
-runbook never uses the words "sluggish" or "unresponsive", so lexical search
-whiffs and only embeddings find it.
+The RAG-favouring questions work in reverse, though less cleanly than they look
+at first. The slow-response runbook does say "unresponsive", and
+`ref-support-faq` says both "sluggish" and "unresponsive", so BM25 and cosine
+both reach the runbook from the demo question — RAG answers it well, but not
+uniquely. The gap opens on paraphrases: "pages take forever to appear" shares no
+content word with the runbook, and BM25 drops it to rank 27 while cosine ranks
+it first.
 
 ### Why .txt and not markdown
 
