@@ -1,0 +1,21 @@
+Runbook: Cinder
+Meridian Systems  |  Operations Runbook
+Last updated: 2025-10-11
+
+Cinder runs on spot capacity. Evictions are normal and expected; the fleet is sized assuming
+a steady background rate of them.
+
+If tier one jobs are missing their one hour budget, check queue depth before checking worker
+health. There is no global backpressure, so a shortage of workers does not slow the rate at
+which jobs are submitted, and the queue can grow past the point where catching up is possible
+within the budget. The manual intervention is to pause tier three submissions.
+
+Never submit a backfill whose output range overlaps the live ingestion window. Output
+partitions are idempotent overwrites, not merges, so an overlapping backfill destroys live
+data rather than duplicating it. Since INC-2088 there is a guard that rejects such jobs, but
+the guard checks the declared range rather than the effective range, and a job with a dynamic
+date expression can still get through.
+
+If Delta Store read latency is climbing during a Cinder recovery, that is the retry storm
+described in INC-2117. Stagger the restart rather than letting the whole fleet re-read at
+once.

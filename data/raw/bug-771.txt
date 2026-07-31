@@ -1,0 +1,20 @@
+BUG-771: Rate limit counters reset on deploy
+Meridian Systems  |  Issue Tracker Export
+Last updated: 2025-06-30
+
+Status: fixed. Severity: low. Customer impact: intermittent, brief.
+
+BUG-771 affects Atlas. Rate limit counters are held in memory per instance, so a rolling
+deploy resets every counter in the fleet. For a short window after each deploy, a client that
+has been throttled is not throttled, and clients that retry aggressively can push a burst
+through.
+
+BUG-771 was reported by Lin Zhao after an enterprise customer observed that their own
+throttling behaviour changed unpredictably and asked, reasonably, what the actual limit was.
+
+BUG-771 was fixed by Marcus Chen. The fix does not move counters out of memory, which was
+judged too expensive at current traffic. Instead the gateway now seeds counters at boot from
+a short window of recent Beacon data, which closes most of the gap without introducing a
+shared store on the hot path.
+
+The residual behaviour is documented in the Atlas runbook as a known rough edge.

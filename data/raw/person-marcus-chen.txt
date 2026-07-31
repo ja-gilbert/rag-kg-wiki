@@ -1,0 +1,19 @@
+Marcus Chen
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Marcus Chen is a staff engineer and the technical lead for gateway work. Marcus Chen is a
+member of the Platform Team.
+
+Marcus Chen resolved INC-2041, restoring the revoked instance role and eliminating the boot
+time dependency on the vendor control plane. That fix, pinning the configuration bundle to a
+local cache, is now the standard pattern for any service that must survive a vendor control
+plane failure.
+
+Marcus Chen fixed BUG-771 and also fixed BUG-903, which is notable because BUG-903 sits in
+Ember, a service owned by the Security Team rather than his own. The fix was made under the
+cross-team exception in the review process, with Tomas Oliveira as reviewer.
+
+He is the author of the internal shared configuration library that Atlas, Beacon, and Ember
+all consume, which makes him an informal dependency for a great deal of work that is not
+formally assigned to him.

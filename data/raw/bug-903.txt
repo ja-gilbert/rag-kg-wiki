@@ -1,0 +1,21 @@
+BUG-903: Introspect endpoint accepts expired tokens during clock skew
+Meridian Systems  |  Issue Tracker Export
+Last updated: 2025-09-22
+
+Status: fixed. Severity: high. Customer impact: none observed.
+
+BUG-903 affects Ember. The /introspect endpoint validated token expiry against the local node
+clock with a five minute tolerance intended to absorb clock skew between regions. The
+tolerance was applied in both directions, so a token that had genuinely expired up to five
+minutes earlier still validated.
+
+BUG-903 was reported by Nadia Petrova during the review that followed INC-2103, while she was
+reading the auth path for logging violations rather than for logic errors.
+
+BUG-903 was fixed by Marcus Chen. This was a cross-team fix, since Ember is owned by the
+Security Team and Marcus Chen is a member of the Platform Team; it proceeded under the
+cross-team exception with Tomas Oliveira as reviewer. The tolerance is now applied only in
+the direction that absorbs skew for not-yet-valid tokens, and expiry is strict.
+
+The five minute revocation confusion this created is distinct from the documented thirty
+second eventual consistency of /revoke.

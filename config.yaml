@@ -1,0 +1,59 @@
+# kb-lab configuration.
+# Everything the three approaches disagree about should be switchable here,
+# so a demo is "flip one key and re-ask" rather than "edit the source".
+
+paths:
+  raw: data/raw
+  ontology: data/ontology.yaml
+  questions: data/questions.yaml
+  build: build          # generated artefacts (vectors, triples) live here
+  wiki: wiki            # the compiled LLM-wiki lives here
+
+embedding:
+  # backend: sentence-transformers | tfidf-svd | hash
+  #   sentence-transformers -> real neural embeddings, ~80MB download on first run
+  #   tfidf-svd             -> LSA, no download, works offline, clearly weaker
+  #   hash                  -> no semantics at all, for showing what broken retrieval looks like
+  backend: sentence-transformers
+  model: sentence-transformers/all-MiniLM-L6-v2
+  cache_dir: models      # model weights are cached here; gitignored
+  dim: 256               # only used by tfidf-svd / hash
+
+chunking:
+  # strategy: paragraph | sentence_window | fixed
+  strategy: paragraph
+  window: 3              # sentence_window only
+  stride: 2              # sentence_window only
+  size: 900              # fixed only
+  overlap: 150           # fixed only
+
+rag:
+  top_k: 5
+  mode: semantic         # semantic | lexical | hybrid
+  alpha: 0.65            # hybrid only: 1.0 = pure semantic, 0.0 = pure BM25
+  low_confidence_threshold: 0.25
+
+kg:
+  max_hops: 4
+  max_answers: 6
+
+wiki:
+  max_pages: 6           # pages loaded as evidence per query
+  backlink_expansion: 1  # how many hops of backlinks to follow from a matched page
+  stale_after_days: 180  # lint flags pages whose newest source is older than this
+
+llm:
+  # backend: extractive | ollama | openai
+  #   extractive -> no model, no key, no network. Cannot hallucinate, cannot paraphrase.
+  #   ollama     -> local generation via http://localhost:11434
+  #   openai     -> needs OPENAI_API_KEY in the environment
+  backend: extractive
+  model: llama3.2
+  host: http://localhost:11434
+  temperature: 0.1
+  max_sentences: 6       # extractive only
+
+server:
+  host: 127.0.0.1
+  port: 8000
+  reload: false

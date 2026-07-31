@@ -1,0 +1,20 @@
+Security Team
+Meridian Systems  |  Team Handbook
+Last updated: 2025-05-02
+
+The Security Team owns authentication, authorization, secrets handling, and the review
+process that gates any change touching those areas.
+
+The Security Team is led by Tomas Oliveira. Nadia Petrova is a member of the Security Team
+and runs the detection and log review practice.
+
+The team owns Ember. This is unusual: at most companies the auth service sits with platform
+engineering. At Meridian it was deliberately placed with security after an early decision
+that the team writing the token logic should be the team accountable for its compromise.
+
+The Credential Rotation Standard was authored by Tomas Oliveira on behalf of this team.
+
+The team is small, four engineers, and its stated operating model is that it should be a
+reviewer and toolmaker rather than a bottleneck. In practice the review queue for auth-path
+changes runs about three days, which teams route around by batching changes, which is the
+opposite of what the policy intends.

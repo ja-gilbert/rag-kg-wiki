@@ -1,0 +1,22 @@
+INC-2088: Beacon Event Loss
+Meridian Systems  |  Incident Review
+Last updated: 2025-07-29
+
+Severity 2. Roughly four hours of raw telemetry events were permanently lost.
+
+INC-2088 was caused by Cinder. A tier three backfill job was submitted with a date range
+that overlapped the live ingestion window. Because the pipeline treats its output partitions
+as idempotent overwrites rather than merges, the backfill rewrote partitions that live
+ingestion was still filling, and the overwritten events were unrecoverable.
+
+INC-2088 affected Beacon. Dashboards showed a clean but wrong picture: the aggregates
+recomputed successfully over the truncated data, so nothing looked broken. The gap was
+noticed only because a customer's usage report did not match their own logs.
+
+INC-2088 was reported by Rafael Ortiz after a customer escalation. INC-2088 was resolved by
+Jonas Weber, who halted the backfill fleet and added a guard rejecting any job whose output
+range intersects the live window.
+
+INC-2088 triggered the Data Retention Policy v3. The review concluded that per-team
+retention windows made it impossible to reason about what had actually been lost, which is
+why v3 centralized retention.

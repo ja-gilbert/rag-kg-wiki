@@ -1,0 +1,30 @@
+# --- agent / assistant working files -- deliberately not part of the repo ---
+CLAUDE.md
+AGENTS.md
+.claude/
+.cursor/
+.aider*
+docs/IMPLEMENTATION.md
+
+# --- python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# --- editors / os ---
+.DS_Store
+.idea/
+.vscode/
+
+# --- generated artefacts (none exist yet, but they will) ---
+build/
+models/
+wiki/pages/
+wiki/index.md
+wiki/log.md
+*.npy
+
+.env

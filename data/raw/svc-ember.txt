@@ -1,0 +1,23 @@
+Ember Authentication Service
+Meridian Systems  |  Service Documentation
+Last updated: 2025-10-19
+
+Ember issues and validates the tokens that every other Meridian service trusts. It is a
+small service by line count and an enormous one by blast radius.
+
+Ember is owned by the Security Team. Ember depends on Delta Store for session and device
+metadata lookups. Ember runs on Northwind Cloud, deliberately in the same regions as Atlas
+so that a regional failure takes out both together rather than leaving Atlas alive but
+unable to authenticate anyone.
+
+Tokens are short-lived by design: fifteen minutes for interactive sessions, sixty minutes
+for machine credentials. Refresh is handled by a separate endpoint that is rate limited far
+more aggressively than the issue path. Ember never logs raw token material, a rule added
+after INC-2103.
+
+The service exposes three endpoints that matter operationally: /issue, /introspect, and
+/revoke. Revocation is eventually consistent with a worst case of thirty seconds, which is
+a deliberate tradeoff and a recurring source of confusion during security reviews.
+
+The Credential Rotation Standard governs Ember. Ember was the origin of INC-2103 and is
+also the service affected by BUG-903.

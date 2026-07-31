@@ -1,0 +1,21 @@
+Vendor Review Policy
+Meridian Systems  |  Policy Document
+Last updated: 2025-07-01
+
+This policy defines what must be established about a vendor before it may sit on a production
+request path, and what must be re-established annually.
+
+The Vendor Review Policy governs Northwind Cloud and governs Kestrel Analytics. It was
+authored by Aisha Bello and requires sign-off from Elena Vasquez for any new vendor on a
+production path.
+
+The central question the policy forces is not whether the vendor is reliable but what the
+vendor can do to us unilaterally, without our consent or notification. Every vendor review
+must enumerate the unilateral actions available to the vendor and the blast radius of each.
+
+No service may depend on a vendor control plane during boot. This clause is a direct product
+of the finding that a silent instance role revocation could drain a service pool to zero
+without any alert firing.
+
+The policy was triggered by INC-2041. Annual re-review is required, and a lapsed review
+blocks contract renewal rather than merely flagging it.

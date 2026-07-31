@@ -1,0 +1,20 @@
+Platform Team
+Meridian Systems  |  Team Handbook
+Last updated: 2025-05-02
+
+The Platform Team owns the runtime substrate every other team builds on: the gateway, the
+deployment tooling, and the shared libraries for configuration and observability.
+
+The Platform Team is led by Priya Raman. Marcus Chen is a member of the Platform Team and
+acts as the technical lead for gateway work specifically.
+
+The team owns Atlas. It does not own Ember, despite Atlas depending on it, and this split
+has been a recurring source of friction during incidents because the team that gets paged
+for a login failure is not the team that can fix it.
+
+The On-Call Policy governs the Platform Team. The team runs a one-week primary rotation with
+a secondary who is expected to be reachable but not awake.
+
+Current headcount is nine engineers. Two open roles have been unfilled for two quarters,
+which is the stated reason global backpressure work on the Cinder scheduler has not been
+picked up even though it sits on the platform debt list.

@@ -1,0 +1,22 @@
+Runbook: Atlas
+Meridian Systems  |  Operations Runbook
+Last updated: 2025-10-11
+
+Atlas holds no durable state. Almost every Atlas problem is either a configuration bundle
+problem or an Ember problem wearing an Atlas costume.
+
+If instances are failing to boot, check whether the configuration bundle is being served and
+whether the instance role is intact. Since INC-2041 the bundle is pinned to a local cache, so
+a boot failure now means the cache is also unavailable, which is a much narrower failure than
+it used to be.
+
+If requests are returning 401 or 403 at unusual rates, this is an Ember problem. Atlas treats
+a failed Ember call as a hard failure by design. Escalate to the Security Team on-call rather
+than debugging in the gateway.
+
+Rate limit counters live in memory and are per-instance. A deploy resets them. This is
+tolerable at current traffic and is a known rough edge.
+
+Configuration refreshes every ninety seconds. If a config change has not taken effect after
+two minutes, the bundle signature check has probably failed, and that failure is logged at
+WARN rather than ERROR, which is a known bad choice nobody has fixed.

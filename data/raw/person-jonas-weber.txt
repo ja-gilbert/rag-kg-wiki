@@ -1,0 +1,17 @@
+Jonas Weber
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Jonas Weber leads the Data Team. Jonas Weber is a member of the Data Team.
+
+Jonas Weber resolved INC-2088, halting the backfill fleet and adding the guard that rejects
+any job whose output range intersects the live ingestion window. He also fixed BUG-812.
+
+He drafted the Data Retention Policy v3 in the six weeks following INC-2088, and his stated
+reasoning was that the incident review had been crippled by not knowing which events had
+existed in the first place. Centralized retention was a means to an auditable answer, not a
+cost measure, though it did reduce storage spend by about eighteen percent.
+
+Jonas Weber is on record as opposed to the single combined on-call rotation his own team
+runs, on the grounds that it burns people out, but has kept it because splitting it would
+create diagnostic handoffs across Cinder, Delta Store, and Beacon.

@@ -1,0 +1,20 @@
+Kestrel Analytics
+Meridian Systems  |  Vendor Record
+Last updated: 2025-07-05
+
+Kestrel Analytics provides the visualization and dashboarding layer that sits on top of
+Beacon. Meridian owns the data; Kestrel owns the interface engineers actually look at.
+
+The Vendor Review Policy governs Kestrel Analytics. The contract runs three years and is
+currently in year two, with Elena Vasquez holding sign-off.
+
+The dependency is subtler than the Northwind Cloud one. Kestrel does not sit on a customer
+request path, so an outage does not affect the product, but it does sit on the incident
+response path. During an incident, engineers cannot see the state of the system without a
+working Kestrel. There is no offline fallback beyond raw queries against Beacon, which few
+engineers can write under pressure.
+
+Kestrel has read access to Beacon raw events, which is why INC-2103 counted the vendor within
+the exposure surface for leaked token material. That finding drove the current requirement
+that any vendor with read access to raw telemetry be enumerated in the incident's exposure
+analysis by default.

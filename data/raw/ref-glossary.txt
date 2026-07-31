@@ -1,0 +1,28 @@
+Internal Glossary
+Meridian Systems  |  Internal Reference
+Last updated: 2025-11-20
+
+Aggregate staleness. The gap between the newest event in Beacon and the newest event
+reflected in a computed aggregate. Normal is under one hour for tier one. The alert threshold
+is twelve hours, which INC-2117 showed to be far too loose.
+
+Blast radius. The set of things a failure can reach. Used in vendor reviews to describe what a
+unilateral vendor action can affect.
+
+Cross-team exception. The process by which an engineer may change a service owned by another
+team, requiring a reviewer from the owning team. BUG-903 was fixed under this exception.
+
+Hard failure. A dependency failure treated as fatal rather than degraded. Atlas treats a
+failed Ember call as a hard failure.
+
+Hot path. The synchronous request path a customer waits on. Atlas, Ember, and Delta Store are
+on it. Beacon and Cinder are not.
+
+Latency budget. The 250 millisecond p99 end-to-end allowance, of which Atlas may consume 40.
+Aisha Bello approves any change that spends more of it.
+
+Tier one, two, three. Cinder job classes with one hour, four hour, and no deadline
+respectively.
+
+Unilateral action. Something a vendor can do without our consent or notification. The
+central question of the Vendor Review Policy.

@@ -1,0 +1,20 @@
+Data Team
+Meridian Systems  |  Team Handbook
+Last updated: 2025-05-02
+
+The Data Team owns everything between raw event ingestion and the numbers a customer sees
+in a report.
+
+The Data Team is led by Jonas Weber. The team owns Beacon, Cinder, and Delta Store, which
+makes it the only team at Meridian responsible for three production services at once.
+
+The On-Call Policy governs the Data Team, but the team runs a modified rotation: a single
+on-call engineer covers all three services, on the theory that the failure modes are so
+interlinked that splitting the rotation would create handoff gaps. INC-2117 is usually cited
+as evidence that this theory is correct, since diagnosing it required holding Cinder, Delta
+Store, and Beacon in mind simultaneously.
+
+The Data Retention Policy v3 was drafted primarily by this team following INC-2088.
+
+Headcount is seven engineers plus one analyst. The analyst role reports into the team but is
+functionally shared with Customer Success.

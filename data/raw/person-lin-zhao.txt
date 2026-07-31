@@ -1,0 +1,17 @@
+Lin Zhao
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Lin Zhao leads Customer Success. Lin Zhao is a member of Customer Success.
+
+Lin Zhao reported INC-2041 after three enterprise customers opened tickets within a ten
+minute window, before any internal alerting fired. She also reported BUG-771.
+
+Following that incident she rewrote the escalation path so that any ticket mentioning
+errors, latency, or missing data goes straight to the owning team's on-call within fifteen
+minutes, skipping first-line triage entirely. The measured effect was a reduction in median
+detection time of roughly twenty-five minutes.
+
+She keeps an informal record of which internal signals customers notice before Meridian
+does, and presents it quarterly. The current entry count is eleven, which she describes as
+eleven arguments for funding data-quality alerting.

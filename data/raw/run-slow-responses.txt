@@ -1,0 +1,25 @@
+Runbook: Degraded Response Times
+Meridian Systems  |  Operations Runbook
+Last updated: 2025-10-11
+
+Use this when requests are completing but taking longer than they should, and when the
+customer-facing symptom is that the product feels unresponsive rather than that it is down.
+
+First establish where the time is going. Compare the Atlas self-reported gateway time against
+total end-to-end time. If the gateway is inside its 40 millisecond allowance, the problem is
+downstream and the gateway is merely reporting it.
+
+The most common downstream cause is not the service that appears slow. A Delta Store read
+latency increase surfaces as authentication timeouts, because Ember does session lookups on
+the hot path, and authentication timeouts surface to the customer as a slow login rather than
+as a data problem. Check Delta Store read percentiles before anything else.
+
+Second most common is spot eviction on the Cinder worker fleet producing a retry storm
+against Delta Store. The signature is Delta Store latency rising with no corresponding rise
+in request volume from the request path.
+
+If aggregates are stale but latency is normal, the product is not slow; the dashboards are
+old. That is a different problem and this is the wrong runbook.
+
+Do not restart the gateway. It holds no durable state and restarting it will not help, but it
+will reset the rate limit counters and produce a thundering herd.

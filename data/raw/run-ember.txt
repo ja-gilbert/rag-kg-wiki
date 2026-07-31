@@ -1,0 +1,21 @@
+Runbook: Ember
+Meridian Systems  |  Operations Runbook
+Last updated: 2025-10-11
+
+Ember is small and its failure modes are mostly not in Ember.
+
+If token issuance is failing, check Delta Store first. Ember depends on Delta Store for
+session and device metadata, and a Delta Store degradation presents as issuance latency
+before it presents as issuance failure.
+
+If revocation appears not to have worked, wait thirty seconds and check again. Revocation is
+eventually consistent with a worst case of thirty seconds. This is documented in the
+Credential Rotation Standard and is not a defect.
+
+The /refresh endpoint is rate limited far more aggressively than /issue. A client that has
+implemented refresh-on-every-request will see throttling that looks like an outage from its
+side and looks like correct behaviour from ours.
+
+Never add logging to the auth path without checking the permitted-logging catalogue. A
+pre-commit check will fail any statement referencing a request body, but the check covers the
+auth path only and is not a substitute for reading the catalogue.

@@ -1,0 +1,22 @@
+Cinder Batch Pipeline
+Meridian Systems  |  Service Documentation
+Last updated: 2025-09-12
+
+Cinder is the batch processing layer that turns raw event streams into everything downstream
+consumes. It runs on a schedule rather than continuously, which is the root of most of its
+interesting failure modes.
+
+Cinder is owned by the Data Team. Cinder depends on Delta Store for the feature definitions
+and lookup tables its jobs join against. Cinder runs on Northwind Cloud using spot capacity,
+which cuts cost by about seventy percent and introduces the eviction behaviour described in
+the Cinder runbook.
+
+Jobs are grouped into three tiers. Tier one jobs feed Beacon aggregates and must complete
+within one hour. Tier two jobs feed reporting and have a four hour budget. Tier three jobs
+are backfills and reprocessing with no hard deadline.
+
+The scheduler has no global backpressure. If tier one jobs fall behind, tier two and three
+jobs continue to be submitted, and the queue grows until something manual intervenes. This
+exact behaviour produced INC-2117.
+
+Cinder was the cause of INC-2088 and is the service affected by BUG-812.

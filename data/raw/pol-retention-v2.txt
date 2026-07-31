@@ -1,0 +1,19 @@
+Data Retention Policy v2
+Meridian Systems  |  Policy Document
+Last updated: 2024-03-11
+
+Superseded. Retained for historical reference only. Do not apply this policy to current
+systems.
+
+Data Retention Policy v2 delegated retention windows to individual teams. Each team declared
+its own schedule in a service manifest, subject to a floor of seven days and a ceiling of
+twenty-four months.
+
+In practice teams chose windows that suited their own debugging habits, and the declared
+manifest values drifted from what the systems actually did. At the time of supersession, three
+of five services had manifest values that did not match their real behaviour.
+
+The policy also permitted per-customer extensions negotiated during enterprise deals, which
+produced a long tail of bespoke retention commitments that nobody tracked centrally.
+
+This policy was superseded by Data Retention Policy v3 following INC-2088.

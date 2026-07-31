@@ -1,0 +1,21 @@
+Beacon Telemetry Platform
+Meridian Systems  |  Service Documentation
+Last updated: 2025-09-30
+
+Beacon is where operational truth lives. Every service emits metrics, traces, and structured
+events into Beacon, and every dashboard and alert we run reads from it.
+
+Beacon is owned by the Data Team. Beacon depends on Cinder to roll raw event streams into
+the hourly and daily aggregates that dashboards actually query. When Cinder is unhealthy,
+Beacon continues to accept writes but its aggregates go stale, which is a failure mode that
+has repeatedly fooled on-call engineers into believing the system is fine.
+
+Beacon runs on Northwind Cloud. The visualization layer is provided by Kestrel Analytics
+under a three-year contract, which means a portion of our observability stack is a vendor
+dependency rather than something we control.
+
+Raw events are retained for thirty days and aggregates for thirteen months. Those numbers
+are set by the Data Retention Policy v3 and are not adjustable per team, a change from the
+previous regime where each team picked its own window.
+
+Beacon was affected by INC-2088, in which roughly four hours of raw events were lost.

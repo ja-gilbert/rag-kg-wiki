@@ -1,0 +1,20 @@
+BUG-812: Backfill guard checks declared range only
+Meridian Systems  |  Issue Tracker Export
+Last updated: 2025-08-05
+
+Status: fixed. Severity: high. Customer impact: potential data loss.
+
+BUG-812 affects Cinder. The guard added after INC-2088 rejects any job whose output range
+intersects the live ingestion window, but it evaluates the declared range at submission time.
+A job specifying a dynamic date expression resolves its real range at execution time, so a
+job that looked safe at submission could overlap live data when it ran.
+
+BUG-812 was reported by Rafael Ortiz, who noticed a near-miss while reviewing a customer
+backfill request and traced the expression evaluation order.
+
+BUG-812 was fixed by Jonas Weber. The guard now evaluates dynamic expressions at submission
+and re-checks the resolved range immediately before the write phase, so a job that drifts
+between submission and execution fails at write time rather than corrupting a partition.
+
+This bug is the reason the Cinder runbook still warns against overlapping backfills despite
+the guard existing.

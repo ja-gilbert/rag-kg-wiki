@@ -1,0 +1,19 @@
+Priya Raman
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Priya Raman leads the Platform Team. She joined Meridian Systems four years ago as a site
+reliability engineer and moved into the lead role two years later.
+
+Priya Raman is a member of the Platform Team. She authored the On-Call Policy, which is the
+document most engineers at the company have actually read end to end, largely because it is
+short and because it makes explicit commitments about compensation and rest.
+
+Priya Raman reported INC-2117, noticing aggregate staleness on the on-call dashboard before
+any alert fired.
+
+Her stated position on the Cinder backpressure debt is that it is the highest-value unfunded
+work at the company, and she has raised it in three consecutive planning cycles.
+
+She is the escalation point of last resort for any Atlas issue, though in practice Marcus
+Chen handles the deep gateway work.

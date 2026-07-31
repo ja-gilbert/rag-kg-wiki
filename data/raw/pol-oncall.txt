@@ -1,0 +1,21 @@
+On-Call Policy
+Meridian Systems  |  Policy Document
+Last updated: 2025-04-19
+
+This policy defines rotation structure, compensation, and the limits of what may be asked of
+an on-call engineer.
+
+The On-Call Policy governs the Platform Team and governs the Data Team. It was authored by
+Priya Raman.
+
+Rotations are one week. There is a primary who is expected to respond within five minutes and
+a secondary who is expected to be reachable within thirty and who is explicitly not expected
+to be awake. No engineer may be primary more than one week in four.
+
+Any page between 22:00 and 07:00 local time entitles the engineer to a compensating day off,
+taken at their discretion and not requiring approval. Any rotation with more than three night
+pages triggers a mandatory review of the alerting that caused them.
+
+Teams may run a modified rotation with the lead's sign-off. The Data Team runs one combined
+rotation across three services under this clause, which the policy permits and which the
+policy's author has said on record she considers a bad idea.

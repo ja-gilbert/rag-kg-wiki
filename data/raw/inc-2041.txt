@@ -1,0 +1,26 @@
+INC-2041: Atlas Regional Outage
+Meridian Systems  |  Incident Review
+Last updated: 2025-06-14
+
+Severity 1. Customer-visible duration was four hours and eleven minutes, the longest in
+company history.
+
+INC-2041 was caused by Northwind Cloud. A control plane change in the us-east-2 region
+silently revoked the instance role that Atlas uses to fetch its configuration bundle at
+boot. Running instances were unaffected, so nothing alerted. When an autoscaling event
+replaced instances forty minutes later, the new ones could not boot, and the pool drained
+to zero over the following hour.
+
+INC-2041 affected Atlas. Because every external request enters through Atlas, the practical
+effect was a total product outage rather than a partial degradation.
+
+INC-2041 was reported by Lin Zhao, who escalated after three enterprise customers opened
+tickets within the same ten minute window. Internal alerting did not fire first, which
+became the most uncomfortable finding of the review.
+
+INC-2041 was resolved by Marcus Chen, who restored the instance role manually and pinned
+the configuration bundle to a local cache so that boot no longer required a live control
+plane call.
+
+INC-2041 triggered the Vendor Review Policy. It also produced the standing rule that any
+dependency on a vendor control plane during service boot is a design defect.

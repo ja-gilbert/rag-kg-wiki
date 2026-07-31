@@ -1,0 +1,22 @@
+Northwind Cloud
+Meridian Systems  |  Vendor Record
+Last updated: 2025-07-05
+
+Northwind Cloud is the infrastructure provider for all Meridian production workloads. Atlas,
+Ember, Beacon, Cinder, and Delta Store all run on Northwind Cloud.
+
+The Vendor Review Policy governs Northwind Cloud. Elena Vasquez holds sign-off on the
+contract, which is renewed annually and which is currently in its third year.
+
+Northwind Cloud caused INC-2041 through a control plane change that silently revoked an
+instance role. The vendor's own status page showed no incident throughout, because from their
+perspective nothing failed; a role was changed, as designed, by a control plane operation.
+That distinction is the reason the Vendor Review Policy now asks what a vendor can do to us
+unilaterally rather than asking how reliable the vendor is.
+
+Spot capacity from Northwind Cloud underlies the Cinder worker fleet and produced the
+eviction wave in INC-2117. Spot pricing saves roughly seventy percent on batch compute and
+the eviction behaviour is considered a fair trade, given backpressure work is possible.
+
+Region coverage is three regions, with us-east-2 carrying about sixty percent of production
+traffic.

@@ -1,0 +1,25 @@
+Atlas API Gateway
+Meridian Systems  |  Service Documentation
+Last updated: 2025-11-04
+
+Atlas is the public edge for every Meridian Systems product. Every external request enters
+through Atlas before it reaches anything else, which makes it the single most load-bearing
+component we operate.
+
+Atlas is owned by the Platform Team. Atlas depends on Ember for request authentication, and
+a failed Ember call is treated as a hard failure rather than a soft one, so an Ember problem
+becomes an Atlas problem within seconds. Atlas runs on Northwind Cloud in three regions,
+with us-east-2 carrying roughly sixty percent of production traffic.
+
+The gateway terminates TLS, applies per-tenant rate limits, and emits a structured access
+record for every request. Those records are shipped to Beacon for aggregation. Atlas keeps
+no durable state of its own; all configuration is pulled at boot from a signed bundle and
+refreshed every ninety seconds.
+
+Capacity planning assumes a p99 latency budget of 250 milliseconds end to end, of which
+Atlas itself is allowed 40 milliseconds. Sustained breach of that budget is the usual first
+signal that something upstream has gone wrong. The Credential Rotation Standard applies to
+Atlas because the gateway holds the signing keys used for internal service-to-service calls.
+
+Historical note: Atlas was affected by INC-2041, the longest customer-visible outage in
+company history.

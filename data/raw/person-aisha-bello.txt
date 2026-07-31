@@ -1,0 +1,17 @@
+Aisha Bello
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Aisha Bello is the product manager for the platform surface area, covering Atlas and the
+developer-facing parts of Ember.
+
+Aisha Bello authored the Vendor Review Policy following INC-2041. Her framing was that the
+outage was not a Northwind Cloud failure so much as a failure to have ever asked what
+Northwind Cloud could do to us unilaterally.
+
+She owns the roadmap conversation in which the Cinder backpressure work has been deferred
+three times, and has been explicit that she does not consider it deferred on merit but on
+the absence of Platform Team headcount to do it.
+
+She is the internal owner of the p99 latency budget of 250 milliseconds and is the person
+who has to approve any change that spends more of it.

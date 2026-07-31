@@ -1,0 +1,71 @@
+# Curated demo questions. Each one is chosen because it makes one approach
+# look good and at least one other approach look bad, for a reason you can
+# explain. `expect` is a hint shown in the UI, not a scoring key.
+
+questions:
+  - q: "Who fixed the bug in the service that Atlas depends on?"
+    expect: kg
+    why: >
+      Three hops (Atlas -> depends_on -> Ember; BUG-903 -> affects -> Ember;
+      BUG-903 -> fixed_by -> Marcus Chen). No single chunk of text states this,
+      so retrieval has nothing to retrieve. The graph walks it in milliseconds.
+
+  - q: "Which policy came out of the incident caused by the service that Beacon depends on?"
+    expect: kg
+    why: >
+      Beacon -> depends_on -> Cinder; INC-2088 -> caused_by -> Cinder;
+      INC-2088 -> triggered -> Data Retention Policy v3. Classic multi-hop join
+      that embeddings cannot express.
+
+  - q: "Which people are within two hops of INC-2041?"
+    expect: kg
+    why: >
+      A structural question with no textual answer at all. Only a graph can
+      answer "within two hops"; RAG cannot represent the question.
+
+  - q: "A customer says the product feels sluggish and unresponsive. What should I check?"
+    expect: rag
+    why: >
+      The runbook never uses the words "sluggish" or "unresponsive". Keyword
+      search misses it entirely; embeddings match it on meaning. The graph has
+      no edge for this because it is procedural knowledge, not a relation.
+
+  - q: "What is the guidance on rotating credentials and keys?"
+    expect: rag
+    why: >
+      Straightforward semantic retrieval over a single dense document. All three
+      approaches do fine; RAG is the cheapest and most direct.
+
+  - q: "How do Atlas, Ember, Beacon, Cinder and Delta Store fit together, and who owns what?"
+    expect: wiki
+    why: >
+      The answer is spread across eight source documents. RAG returns five
+      disconnected chunks that each answer a fifth of it. The wiki has a
+      pre-compiled page that already did the synthesis once, offline.
+
+  - q: "What has repeatedly gone wrong with our vendors, and what did we change because of it?"
+    expect: wiki
+    why: >
+      Requires connecting two vendors, two incidents, one policy and a standing
+      design rule. The wiki's compile step already wrote and backlinked that
+      page; RAG has to rebuild the connection from scratch on every query.
+
+  - q: "What is Delta Store and why does it matter so much?"
+    expect: wiki
+    why: >
+      An entity-overview question. Exactly what a wiki page is for, and exactly
+      what chunk retrieval fragments.
+
+  - q: "What was Meridian Systems' revenue last quarter?"
+    expect: none
+    why: >
+      Not in the corpus. Watch the three failure modes side by side: RAG returns
+      low-scoring chunks about anything numeric, the graph returns no path and
+      says so cleanly, the wiki reports no page found. This is the honesty test.
+
+  - q: "Which team is paged for a login failure they cannot fix?"
+    expect: tie
+    why: >
+      The answer is stated almost verbatim in two documents, so RAG nails it,
+      and the graph derives it independently from ownership plus dependency
+      edges. Useful for showing two different routes to the same answer.

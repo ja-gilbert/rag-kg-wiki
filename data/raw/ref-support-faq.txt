@@ -1,0 +1,25 @@
+Support: Common Customer Questions
+Meridian Systems  |  Internal Reference
+Last updated: 2025-11-02
+
+Customers report that the product feels sluggish or unresponsive far more often than they
+report that it is down. In almost every case the underlying cause is not where the customer
+points.
+
+When a customer says logins are taking a long time, the cause is usually not authentication
+capacity. Ember reads session and device metadata from Delta Store on the hot path, so a
+Delta Store slowdown appears to the customer as slow sign-in. Check Delta Store read
+percentiles first.
+
+When a customer says their numbers look wrong or out of date, distinguish between wrong and
+old. Old numbers mean Cinder is behind and aggregates are stale; the system is healthy and
+the dashboard is not current. Wrong numbers are far more serious and have historically meant
+data loss, as in INC-2088.
+
+When a customer says they are being throttled unpredictably, this is usually the rate limit
+counter behaviour described in BUG-771. Counters are per-instance and in memory, and a deploy
+seeds them from recent data rather than preserving exact state.
+
+When a customer asks how long we keep their data, the answer comes from Data Retention Policy
+v3 and there is no exception path, including for enterprise contracts. Thirty days raw,
+thirteen months aggregated, ninety days session metadata.

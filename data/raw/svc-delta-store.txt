@@ -1,0 +1,21 @@
+Delta Store Feature Store
+Meridian Systems  |  Service Documentation
+Last updated: 2025-08-21
+
+Delta Store holds the canonical feature and reference data that other services read at
+request time. It is the closest thing Meridian has to a shared database, and it is treated
+with corresponding caution.
+
+Delta Store is owned by the Data Team. Delta Store runs on Northwind Cloud with synchronous
+replication across two regions and asynchronous replication to a third.
+
+Two services read from Delta Store on the hot path: Ember, for session and device metadata,
+and Cinder, for feature definitions. That combination means a Delta Store degradation shows
+up simultaneously as an authentication problem and a data pipeline problem, which has caused
+misdiagnosis more than once.
+
+Writes are append-only with a compaction pass that runs nightly. Readers always see a
+consistent snapshot; the tradeoff is that a write is not visible to readers for up to ten
+seconds.
+
+The Data Retention Policy v3 governs Delta Store. Delta Store was affected by INC-2117.

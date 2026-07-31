@@ -1,0 +1,23 @@
+INC-2117: Cinder Queue Backlog
+Meridian Systems  |  Incident Review
+Last updated: 2025-10-02
+
+Severity 3. No data loss, but tier one aggregates were stale for eleven hours.
+
+INC-2117 was caused by Cinder. A spot capacity shortage in the primary region evicted
+roughly eighty percent of the worker fleet over twenty minutes. Because the Cinder scheduler
+has no global backpressure, tier two and tier three jobs continued to be submitted on
+schedule while tier one jobs starved behind them in a single shared queue.
+
+INC-2117 affected Delta Store, which absorbed a retry storm as evicted jobs restarted and
+re-read their feature definitions. Read latency at the ninety-ninth percentile went from
+eleven milliseconds to just over two seconds, which in turn slowed Ember's session lookups
+and produced a wave of authentication timeouts that looked, from the outside, like an
+entirely separate incident.
+
+INC-2117 was reported by Priya Raman, who noticed the aggregate staleness from the on-call
+dashboard rather than from an alert, because the staleness alert had been tuned to a
+twelve hour threshold.
+
+Remediation was partial. Priority queues were added, but global backpressure remains
+unbuilt and is tracked as ongoing platform debt.

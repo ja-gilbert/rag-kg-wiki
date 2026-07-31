@@ -1,0 +1,17 @@
+Tomas Oliveira
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Tomas Oliveira leads the Security Team. Tomas Oliveira is a member of the Security Team.
+
+Tomas Oliveira resolved INC-2103, purging exposed log partitions, forcing revocation of every
+token issued during the exposure window, and adding the pre-commit check that fails on log
+statements referencing request bodies in the auth path.
+
+Tomas Oliveira authored the Credential Rotation Standard, which was written directly in
+response to that incident and which now governs both Ember and Atlas.
+
+He reviewed the cross-team fix Marcus Chen made for BUG-903. His position on the three-day
+review queue is that the queue length is a staffing problem rather than a process problem,
+and that batching changes to route around it is the single most dangerous habit currently
+present in the engineering organization.

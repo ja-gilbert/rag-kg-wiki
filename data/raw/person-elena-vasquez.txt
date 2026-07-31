@@ -1,0 +1,20 @@
+Elena Vasquez
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Dr. Elena Vasquez is the chief technology officer of Meridian Systems and has been with the
+company since its second year.
+
+Elena Vasquez made the original decision to place Ember with the Security Team rather than
+the Platform Team, on the argument that the team writing token logic should be the team
+accountable for its compromise. That decision is periodically relitigated during incidents
+where the Platform Team is paged for an authentication failure it cannot fix.
+
+She chairs the incident review process. All four incidents on record, INC-2041, INC-2088,
+INC-2103, and INC-2117, went through reviews she ran, and the standing rule that emerged
+from INC-2041, that a dependency on a vendor control plane during service boot is a design
+defect, is hers.
+
+She has final sign-off on the Vendor Review Policy and on any contract with a vendor that
+sits on a production request path, which currently means Northwind Cloud and Kestrel
+Analytics.

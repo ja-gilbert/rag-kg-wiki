@@ -1,0 +1,21 @@
+Data Retention Policy v3
+Meridian Systems  |  Policy Document
+Last updated: 2025-09-08
+
+This policy sets a single company-wide retention schedule. It replaces the previous regime in
+which each team selected its own windows.
+
+Data Retention Policy v3 supersedes Data Retention Policy v2. The policy governs Beacon and
+governs Delta Store, and applies to any future service that stores customer-derived data.
+
+Raw telemetry events are retained for thirty days. Aggregates derived from those events are
+retained for thirteen months. Session and device metadata is retained for ninety days after
+last activity. There is no per-team and no per-customer exception path, which is deliberate
+and which is the most frequently contested clause in the document.
+
+The rationale is auditability rather than cost. The review of INC-2088 could not determine
+what had been lost because no one could establish what had existed, and the drafters
+concluded that a uniform schedule was a precondition for ever answering that question again.
+
+The policy was triggered by INC-2088 and was drafted by Jonas Weber. Storage spend fell about
+eighteen percent as a side effect.

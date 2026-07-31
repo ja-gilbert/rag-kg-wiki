@@ -1,0 +1,18 @@
+Nadia Petrova
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Nadia Petrova is a security engineer and runs the detection and log review practice. Nadia
+Petrova is a member of the Security Team.
+
+Nadia Petrova reported INC-2103, finding full bearer tokens in Beacon during a routine log
+sampling review nine days after the offending statement shipped. She also reported BUG-903.
+
+The log sampling practice she runs is manual and scheduled weekly, which is the reason the
+exposure ran for nine days rather than one. She has argued for automated secret scanning on
+the ingestion path into Beacon rather than sampling after the fact, and that work is funded
+but not yet started.
+
+She maintains the internal catalogue of what each service is permitted to log, which is the
+document teams are supposed to consult before adding instrumentation and which almost nobody
+consults before adding instrumentation.

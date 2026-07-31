@@ -1,0 +1,22 @@
+INC-2103: Ember Token Material in Logs
+Meridian Systems  |  Incident Review
+Last updated: 2025-08-16
+
+Severity 2. No confirmed external exploitation, but treated as a credential exposure.
+
+INC-2103 was caused by Ember. A debug logging statement added during a performance
+investigation wrote the full request body of the /introspect endpoint at INFO level. Request
+bodies to that endpoint contain complete bearer tokens. The statement shipped on a Tuesday
+and ran in production for nine days before anyone noticed.
+
+Because logs are shipped to Beacon and Beacon retains raw events for thirty days, the
+exposure surface was every engineer with dashboard access, plus the vendor that operates the
+visualization layer.
+
+INC-2103 was reported by Nadia Petrova during a routine log sampling review. INC-2103 was
+resolved by Tomas Oliveira, who purged the affected partitions, forced revocation of every
+token issued in the window, and added a pre-commit check that fails on any log statement
+referencing a request body in the auth path.
+
+INC-2103 triggered the Credential Rotation Standard. It is also the origin of the rule that
+Ember never logs raw token material under any log level.

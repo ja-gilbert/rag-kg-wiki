@@ -1,0 +1,23 @@
+Meridian Systems Architecture Overview
+Meridian Systems  |  Internal Reference
+Last updated: 2025-11-20
+
+Meridian Systems runs five production services. Requests arrive at Atlas, are authenticated
+via Ember, and are served by product code that reads reference data from Delta Store.
+Everything emits telemetry into Beacon, and Cinder turns that telemetry into the aggregates
+that dashboards and customer-facing reports read.
+
+The dependency shape is deliberately shallow on the request path and deep off it. On the hot
+path there are two hops: Atlas to Ember, and Ember to Delta Store. Off the hot path, Beacon
+depends on Cinder and Cinder depends on Delta Store, which means Delta Store is the only
+component that both the request path and the analytics path depend on. It is the closest
+thing the architecture has to a single point of failure, and INC-2117 demonstrated exactly
+how that manifests: a batch problem became an authentication problem.
+
+Ownership does not follow the dependency graph. The Platform Team owns Atlas. The Security
+Team owns Ember. The Data Team owns Beacon, Cinder, and Delta Store. This means the two hops
+on the hot path cross a team boundary, and the team paged for a login failure is not the team
+that can fix it.
+
+All five services run on Northwind Cloud. The observability interface is provided by Kestrel
+Analytics. Both vendors are covered by the Vendor Review Policy.

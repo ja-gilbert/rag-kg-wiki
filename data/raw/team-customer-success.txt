@@ -1,0 +1,21 @@
+Customer Success
+Meridian Systems  |  Team Handbook
+Last updated: 2025-05-02
+
+Customer Success is the first human contact point when something is wrong, and in practice
+it has been the first detection point for two of the four incidents on record.
+
+Customer Success is led by Lin Zhao. Rafael Ortiz is a member of Customer Success and works
+as the solutions architect for enterprise accounts.
+
+The team does not own any service. It does own the escalation path: any ticket that mentions
+errors, latency, or missing data is escalated to the owning team's on-call within fifteen
+minutes rather than being triaged first.
+
+That rule exists because of INC-2041, which Lin Zhao reported after three enterprise
+customers opened tickets before any internal alert fired. The review found that the previous
+triage-first process had added twenty-five minutes to detection.
+
+Rafael Ortiz reported INC-2088, again from a customer signal rather than an internal one.
+The pattern is well known internally and is the strongest argument in the current push to
+fund better data-quality alerting.

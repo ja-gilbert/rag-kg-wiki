@@ -1,0 +1,15 @@
+# Core -- required
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.6
+PyYAML>=6.0
+numpy>=1.26
+scikit-learn>=1.4
+networkx>=3.2
+
+# Real embeddings. Comment this out to run fully offline on the tfidf-svd
+# fallback (set embedding.backend: tfidf-svd in config.yaml).
+sentence-transformers>=2.7
+
+# Dev
+pytest>=8.0

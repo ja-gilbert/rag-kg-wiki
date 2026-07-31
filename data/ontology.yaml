@@ -1,0 +1,185 @@
+# Ontology for the knowledge-graph approach.
+#
+# This file is the ONLY hand-authored input to graph construction. It declares
+# what kinds of things exist, what they are called, and which surface patterns
+# in prose express which relations. Everything else -- every node and every
+# edge in the graph -- is extracted from data/raw/*.md by kgraph/extract.py.
+#
+# Nothing in data/raw contains machine-readable relations. That is deliberate:
+# a KG demo where the edges were pre-declared in frontmatter would be a
+# demo of reading YAML, not of building a knowledge graph.
+
+entity_types:
+  Service:   { color: "#4f8dfd", shape: "circle" }
+  Person:    { color: "#f5a524", shape: "circle" }
+  Team:      { color: "#22c55e", shape: "circle" }
+  Incident:  { color: "#ef4444", shape: "diamond" }
+  Bug:       { color: "#f472b6", shape: "diamond" }
+  Policy:    { color: "#a78bfa", shape: "square" }
+  Vendor:    { color: "#14b8a6", shape: "square" }
+  Runbook:   { color: "#94a3b8", shape: "square" }
+
+# Canonical entities and their surface aliases. The extractor builds a
+# gazetteer from this; longest alias wins when two overlap.
+entities:
+  # --- Services ---
+  - { name: "Atlas",            type: Service, aliases: ["Atlas API Gateway", "the gateway"] }
+  - { name: "Ember",            type: Service, aliases: ["Ember Authentication Service", "Ember Auth"] }
+  - { name: "Beacon",           type: Service, aliases: ["Beacon Telemetry Platform"] }
+  - { name: "Cinder",           type: Service, aliases: ["Cinder Batch Pipeline"] }
+  - { name: "Delta Store",      type: Service, aliases: ["Delta Store Feature Store"] }
+
+  # --- People ---
+  - { name: "Priya Raman",      type: Person,  aliases: ["Priya"] }
+  - { name: "Marcus Chen",      type: Person,  aliases: ["Marcus"] }
+  - { name: "Jonas Weber",      type: Person,  aliases: ["Jonas"] }
+  - { name: "Tomas Oliveira",   type: Person,  aliases: ["Tomas"] }
+  - { name: "Nadia Petrova",    type: Person,  aliases: ["Nadia"] }
+  - { name: "Lin Zhao",         type: Person,  aliases: ["Lin"] }
+  - { name: "Rafael Ortiz",     type: Person,  aliases: ["Rafael"] }
+  - { name: "Aisha Bello",      type: Person,  aliases: ["Aisha"] }
+  - { name: "Elena Vasquez",    type: Person,  aliases: ["Dr. Elena Vasquez", "Elena"] }
+
+  # --- Teams ---
+  - { name: "Platform Team",    type: Team,    aliases: ["the Platform Team"] }
+  - { name: "Data Team",        type: Team,    aliases: ["the Data Team"] }
+  - { name: "Security Team",    type: Team,    aliases: ["the Security Team"] }
+  - { name: "Customer Success", type: Team,    aliases: [] }
+
+  # --- Incidents ---
+  - { name: "INC-2041",         type: Incident, aliases: [] }
+  - { name: "INC-2088",         type: Incident, aliases: [] }
+  - { name: "INC-2103",         type: Incident, aliases: [] }
+  - { name: "INC-2117",         type: Incident, aliases: [] }
+
+  # --- Bugs ---
+  - { name: "BUG-771",          type: Bug,     aliases: [] }
+  - { name: "BUG-812",          type: Bug,     aliases: [] }
+  - { name: "BUG-903",          type: Bug,     aliases: [] }
+
+  # --- Policies ---
+  - { name: "Data Retention Policy v3", type: Policy, aliases: ["Retention Policy v3", "v3"] }
+  - { name: "Data Retention Policy v2", type: Policy, aliases: ["Retention Policy v2", "v2"] }
+  - { name: "On-Call Policy",           type: Policy, aliases: ["the On-Call Policy"] }
+  - { name: "Vendor Review Policy",     type: Policy, aliases: ["the Vendor Review Policy"] }
+  - { name: "Credential Rotation Standard", type: Policy, aliases: ["the Credential Rotation Standard"] }
+
+  # --- Vendors ---
+  - { name: "Northwind Cloud",  type: Vendor,  aliases: ["Northwind"] }
+  - { name: "Kestrel Analytics", type: Vendor, aliases: ["Kestrel"] }
+
+# Relation extraction patterns.
+#
+#   pattern    regex with named groups (?P<s>...) and (?P<o>...) which must
+#              each match an ENTITY placeholder written as {E}
+#   inverse    if true, the matched (s, o) is emitted as (o, predicate, s)
+#
+# {E} is expanded by the extractor into an alternation over every known alias.
+relations:
+  owned_by:
+    label: "owned by"
+    inverse_label: "owns"
+    patterns:
+      - "{s} is owned by {o}"
+      - "{s} is maintained by {o}"
+      - "{s} team owns {o}||inverse"
+      - "{s} owns {o}||inverse"
+      - "The team owns {o}"          # subject resolved from document entity
+  led_by:
+    label: "led by"
+    inverse_label: "leads"
+    patterns:
+      - "{s} is led by {o}"
+      - "{s} leads {o}||inverse"
+  member_of:
+    label: "member of"
+    inverse_label: "has member"
+    patterns:
+      - "{s} is a member of {o}"
+      - "{s} joined {o}"
+  depends_on:
+    label: "depends on"
+    inverse_label: "required by"
+    patterns:
+      - "{s} depends on {o}"
+      - "{s} reads from {o}"
+      - "{s} calls {o}"
+      - "{s} requires {o}"
+  runs_on:
+    label: "runs on"
+    inverse_label: "hosts"
+    patterns:
+      - "{s} runs on {o}"
+      - "{s} is hosted on {o}"
+      - "{s} is deployed on {o}"
+      - "{s} all run on {o}"
+  caused_by:
+    label: "caused by"
+    inverse_label: "caused"
+    patterns:
+      - "{s} was caused by {o}"
+      - "{s} caused {o}||inverse"
+      - "{s} was the cause of {o}||inverse"
+      - "{s} was the origin of {o}||inverse"
+  affects:
+    label: "affects"
+    inverse_label: "affected by"
+    patterns:
+      - "{s} affected {o}"
+      - "{s} affects {o}"
+      - "{s} was affected by {o}||inverse"
+      - "{s} impacted {o}"
+  reported_by:
+    label: "reported by"
+    inverse_label: "reported"
+    patterns:
+      - "{s} was reported by {o}"
+      - "{s} reported {o}||inverse"
+  resolved_by:
+    label: "resolved by"
+    inverse_label: "resolved"
+    patterns:
+      - "{s} was resolved by {o}"
+      - "{s} resolved {o}||inverse"
+  fixed_by:
+    label: "fixed by"
+    inverse_label: "fixed"
+    patterns:
+      - "{s} was fixed by {o}"
+      - "{s} fixed {o}||inverse"
+  triggered:
+    label: "triggered"
+    inverse_label: "triggered by"
+    patterns:
+      - "{s} triggered {o}"
+      - "{s} was triggered by {o}||inverse"
+      - "{s} produced {o}"
+  supersedes:
+    label: "supersedes"
+    inverse_label: "superseded by"
+    patterns:
+      - "{s} supersedes {o}"
+      - "{s} replaces {o}"
+      - "{s} was superseded by {o}||inverse"
+  governs:
+    label: "governs"
+    inverse_label: "governed by"
+    patterns:
+      - "{s} governs {o}"
+      - "{s} applies to {o}"
+      - "{s} covers {o}"
+      - "The {s} governs {o}"
+  authored_by:
+    label: "authored by"
+    inverse_label: "authored"
+    patterns:
+      - "{s} was authored by {o}"
+      - "{s} was drafted by {o}"
+      - "{s} authored {o}||inverse"
+      - "{s} drafted {o}||inverse"
+  provides:
+    label: "provides"
+    inverse_label: "provided by"
+    patterns:
+      - "{s} provides {o}"
+      - "{s} is provided by {o}||inverse"

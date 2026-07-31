@@ -1,0 +1,17 @@
+Rafael Ortiz
+Meridian Systems  |  Staff Directory
+Last updated: 2025-05-10
+
+Rafael Ortiz is a solutions architect working with enterprise accounts. Rafael Ortiz is a
+member of Customer Success.
+
+Rafael Ortiz reported INC-2088, escalating after a customer's usage report failed to match
+their own logs. He also reported BUG-812.
+
+His role sits at an unusual angle to the engineering organization: he is the person most
+likely to notice that a number is wrong rather than that a system is down, and both incidents
+he reported were correctness failures rather than availability failures.
+
+He runs the pre-sales technical review for enterprise deals, which is where the retention
+windows in the Data Retention Policy v3 most often come up, because prospects routinely ask
+for longer windows than the policy permits and there is no per-customer exception path.
