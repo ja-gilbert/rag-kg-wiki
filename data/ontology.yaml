@@ -79,27 +79,35 @@ relations:
   owned_by:
     label: "owned by"
     inverse_label: "owns"
+    domain: [Service]
+    range: [Team]
     patterns:
       - "{s} is owned by {o}"
       - "{s} is maintained by {o}"
       - "{s} team owns {o}||inverse"
       - "{s} owns {o}||inverse"
-      - "The team owns {o}"          # subject resolved from document entity
+      - "The team owns {o}||inverse" # subject resolved from document entity
   led_by:
     label: "led by"
     inverse_label: "leads"
+    domain: [Team]
+    range: [Person]
     patterns:
       - "{s} is led by {o}"
       - "{s} leads {o}||inverse"
   member_of:
     label: "member of"
     inverse_label: "has member"
+    domain: [Person]
+    range: [Team]
     patterns:
       - "{s} is a member of {o}"
       - "{s} joined {o}"
   depends_on:
     label: "depends on"
     inverse_label: "required by"
+    domain: [Service]
+    range: [Service, Vendor]
     patterns:
       - "{s} depends on {o}"
       - "{s} reads from {o}"
@@ -108,6 +116,8 @@ relations:
   runs_on:
     label: "runs on"
     inverse_label: "hosts"
+    domain: [Service]
+    range: [Vendor]
     patterns:
       - "{s} runs on {o}"
       - "{s} is hosted on {o}"
@@ -116,6 +126,8 @@ relations:
   caused_by:
     label: "caused by"
     inverse_label: "caused"
+    domain: [Incident]
+    range: [Service, Vendor]
     patterns:
       - "{s} was caused by {o}"
       - "{s} caused {o}||inverse"
@@ -124,6 +136,8 @@ relations:
   affects:
     label: "affects"
     inverse_label: "affected by"
+    domain: [Bug, Incident]
+    range: [Service]
     patterns:
       - "{s} affected {o}"
       - "{s} affects {o}"
@@ -132,24 +146,32 @@ relations:
   reported_by:
     label: "reported by"
     inverse_label: "reported"
+    domain: [Bug, Incident]
+    range: [Person]
     patterns:
       - "{s} was reported by {o}"
       - "{s} reported {o}||inverse"
   resolved_by:
     label: "resolved by"
     inverse_label: "resolved"
+    domain: [Incident]
+    range: [Person]
     patterns:
       - "{s} was resolved by {o}"
       - "{s} resolved {o}||inverse"
   fixed_by:
     label: "fixed by"
     inverse_label: "fixed"
+    domain: [Bug]
+    range: [Person]
     patterns:
       - "{s} was fixed by {o}"
       - "{s} fixed {o}||inverse"
   triggered:
     label: "triggered"
     inverse_label: "triggered by"
+    domain: [Incident]
+    range: [Policy]
     patterns:
       - "{s} triggered {o}"
       - "{s} was triggered by {o}||inverse"
@@ -157,6 +179,8 @@ relations:
   supersedes:
     label: "supersedes"
     inverse_label: "superseded by"
+    domain: [Policy]
+    range: [Policy]
     patterns:
       - "{s} supersedes {o}"
       - "{s} replaces {o}"
@@ -164,6 +188,8 @@ relations:
   governs:
     label: "governs"
     inverse_label: "governed by"
+    domain: [Policy]
+    range: [Service, Team, Vendor]
     patterns:
       - "{s} governs {o}"
       - "{s} applies to {o}"
@@ -172,6 +198,8 @@ relations:
   authored_by:
     label: "authored by"
     inverse_label: "authored"
+    domain: [Policy]
+    range: [Person]
     patterns:
       - "{s} was authored by {o}"
       - "{s} was drafted by {o}"
@@ -180,6 +208,22 @@ relations:
   provides:
     label: "provides"
     inverse_label: "provided by"
+    domain: [Vendor]
+    range: [Service]
     patterns:
       - "{s} provides {o}"
       - "{s} is provided by {o}||inverse"
+  # Authority over a policy or a vendor contract. The corpus never states this
+  # with a named subject -- it is always "It ... requires sign-off from X", or
+  # "with X holding sign-off", or "She has final sign-off on Y" -- so every
+  # pattern here leans on the document entity for its other endpoint.
+  signed_off_by:
+    label: "signed off by"
+    inverse_label: "signs off on"
+    domain: [Policy, Vendor]
+    range: [Person]
+    patterns:
+      - "requires sign-off from {o}"      # subject resolved from document entity
+      - "{o} holds sign-off"              # subject resolved from document entity
+      - "with {o} holding sign-off"       # subject resolved from document entity
+      - "has final sign-off on {o}||inverse"  # subject resolved from document entity
