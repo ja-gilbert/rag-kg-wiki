@@ -296,8 +296,8 @@ four runbooks, two vendors, three reference docs.
 
 It's synthetic on purpose and reverse-engineered from the demo questions: facts
 are deliberately scattered so that multi-hop questions are genuinely multi-hop.
-`bug-903.md` says BUG-903 affects Ember and was fixed by Marcus Chen;
-`svc-atlas.md` says Atlas depends on Ember. Three files, one three-hop question.
+`bug-903.txt` says BUG-903 affects Ember and was fixed by Marcus Chen;
+`svc-atlas.txt` says Atlas depends on Ember. Three files, one three-hop question.
 
 The RAG-favouring questions work the same way in reverse. The slow-response
 runbook never uses the words "sluggish" or "unresponsive", so lexical search
