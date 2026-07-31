@@ -26,9 +26,12 @@ questions:
   - q: "A customer says the product feels sluggish and unresponsive. What should I check?"
     expect: rag
     why: >
-      The runbook never uses the words "sluggish" or "unresponsive". Keyword
-      search misses it entirely; embeddings match it on meaning. The graph has
-      no edge for this because it is procedural knowledge, not a relation.
+      Procedural knowledge, with no relation to traverse, so the graph has
+      nothing to walk. Both lexical and semantic retrieval reach the runbook
+      from this phrasing, which shares "customer", "product" and "feels" with
+      it, so RAG wins here on having an answer at all rather than on finding
+      one nothing else can. Re-ask it as "pages take forever to appear" and the
+      split appears: BM25 drops the runbook to rank 27, embeddings keep it first.
 
   - q: "What is the guidance on rotating credentials and keys?"
     expect: rag
