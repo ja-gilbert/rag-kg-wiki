@@ -1,0 +1,12 @@
+# Git for Windows sets core.autocrlf=true at system scope, which rewrites files
+# to CRLF on checkout. This overrides it: LF in the index and in the working
+# tree, on every platform.
+#
+# Line endings are load-bearing here. The corpus loader reads data/raw/*.txt
+# positionally -- line 1 title, line 3 `Last updated:` -- and the sentence
+# splitter collapses intra-paragraph newlines, so a stray \r would ride along on
+# the end of every title, date and sentence and quietly poison extraction.
+# setup.sh is run by sh, where CRLF breaks the shebang outright.
+#
+# text=auto still lets Git detect binaries and leave them alone.
+* text=auto eol=lf

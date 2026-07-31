@@ -3,7 +3,7 @@
 # This file is the ONLY hand-authored input to graph construction. It declares
 # what kinds of things exist, what they are called, and which surface patterns
 # in prose express which relations. Everything else -- every node and every
-# edge in the graph -- is extracted from data/raw/*.md by kgraph/extract.py.
+# edge in the graph -- is extracted from data/raw/*.txt by kgraph/extract.py.
 #
 # Nothing in data/raw contains machine-readable relations. That is deliberate:
 # a KG demo where the edges were pre-declared in frontmatter would be a

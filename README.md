@@ -107,6 +107,7 @@ That creates `.venv` and installs dependencies. There's nothing to run yet.
 docs/ARCHITECTURE.md      the design and the reasoning behind it
 config.yaml               every knob the three approaches disagree about
 requirements.txt          intended dependency set
+setup.ps1 / setup.sh      create .venv and install dependencies
 data/
   raw/*.txt               39 source documents  (immutable, never edited)
   ontology.yaml           entity types, aliases, relation patterns
