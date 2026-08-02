@@ -12,6 +12,7 @@ from core.corpus import load_corpus
 from kgraph.extract import extract_triples
 from kgraph.graph import KnowledgeGraph
 from kgraph.ontology import Gazetteer, Ontology
+from wikigen import journal
 from wikigen.entity_pages import entity_page
 from wikigen.page import WikiPage
 from wikigen.sources import index_sources
@@ -59,7 +60,7 @@ def compile_wiki(cfg: dict[str, Any]) -> CompileResult:
         doc_count=len(documents),
         seconds=time.perf_counter() - started,
     )
-    _log(root, f"COMPILE {result.page_count} pages from {result.doc_count} documents")
+    journal.append(root, f"COMPILE {result.page_count} pages from {result.doc_count} documents")
     return result
 
 
@@ -135,15 +136,6 @@ def _index(pages: list[WikiPage]) -> str:
         f"- [[{page.title}]] — {page.summary}" for page in pages if page.page_type == "topic"
     ]
     return "\n".join(lines) + "\n"
-
-
-def _log(root: Path, message: str) -> None:
-    log = root / "log.md"
-    if not log.exists():
-        log.write_text("# Log\n\nAppend-only. Newest entries at the bottom.\n\n", encoding="utf-8")
-    stamp = dt.datetime.now().isoformat(timespec="seconds")
-    with log.open("a", encoding="utf-8") as handle:
-        handle.write(f"- {stamp} {message}\n")
 
 
 def slug(title: str) -> str:
