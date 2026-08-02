@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import replace
 from pathlib import Path
 
@@ -306,3 +307,52 @@ def test_the_scoreboard_reads_the_envelope_not_the_approach_name():
     rows = scoreboard([answer("rag"), answer("kg", detail={"path": {"text": "A -> B"}})])
     assert [r["derivation_shown"] for r in rows] == [False, True]
     assert [r["documents_touched"] for r in rows] == [2, 2]
+
+
+# --------------------------------------------------------------------------
+# the page itself
+# --------------------------------------------------------------------------
+
+STATIC = ROOT / "app" / "static"
+
+
+def test_the_compare_page_is_served_at_the_root(client):
+    body = client.get("/").text
+    assert client.get("/").headers["content-type"].startswith("text/html")
+    assert "column-template" in body
+    assert 'id="board"' in body
+
+
+def test_the_stylesheet_and_script_are_served(client):
+    for path in ("/static/app.css", "/static/app.js"):
+        response = client.get(path)
+        assert response.status_code == 200, path
+        assert response.text.strip(), path
+
+
+def test_the_page_asks_for_nothing_off_this_machine():
+    # No CDN, no web fonts, no analytics: this has to render with the lid shut
+    # on a plane. A single absolute URL would break that silently.
+    for path in sorted(STATIC.glob("*")):
+        text = path.read_text(encoding="utf-8")
+        for scheme in ("http://", "https://", "//cdn", "@import url("):
+            assert scheme not in text, f"{path.name} reaches for {scheme}"
+
+
+def test_every_endpoint_the_page_calls_actually_exists(client):
+    # There is no build step, so nothing else checks that the frontend and the
+    # API still agree. Renaming a route without renaming its caller would
+    # otherwise only show up as a blank column in front of an audience.
+    script = (STATIC / "app.js").read_text(encoding="utf-8")
+    called = set(re.findall(r"[\"'`](/api/[a-z_]+)", script))
+    routes = {getattr(r, "path", "") for r in client.app.routes}
+    assert called, "no API calls found in app.js -- has the fetch style changed?"
+    assert called <= routes, called - routes
+
+
+def test_the_page_declares_the_tabs_that_are_still_to_come(client):
+    # Compare is built; the other three are marked as unbuilt rather than
+    # quietly missing, so the shape of the finished UI is visible.
+    body = client.get("/").text
+    for panel in ("compare", "graph", "wiki", "sources"):
+        assert f'data-panel="{panel}"' in body
