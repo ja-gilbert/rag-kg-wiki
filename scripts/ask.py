@@ -2,34 +2,27 @@ from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 from typing import Any
 
-import yaml
-
+from app.registry import build_lab
 from approaches.base import Answer, Approach
-from approaches.kg import KgApproach
-from approaches.rag import RagApproach
-from approaches.wiki import WikiApproach
 from core.config import DEFAULT_CONFIG_PATH, load_config
-from core.llm import build_llm
-from scripts.artefacts import ArtefactMissing, load_kg, load_rag, load_wiki
+from scripts.artefacts import ArtefactMissing
 
 
 def load_approaches(cfg: dict[str, Any]) -> list[Approach]:
     """Every approach, sharing one generator.
 
-    Non-negotiable #5: they get the same backend and the same prompt, so any
-    difference between the answers is a difference in what each one found.
+    Wired in `app.registry` and borrowed here rather than built twice: the
+    terminal and the browser have to be running the same three objects, or
+    non-negotiable #5 holds only by coincidence. The server turns a missing
+    artefact into a banner; a CLI has nowhere to put a banner, so it gets the
+    exception back.
     """
-    store, bm25, embedder = load_rag(cfg)
-    graph, ontology = load_kg(cfg)
-    llm = build_llm(cfg["llm"])
-    return [
-        RagApproach(store=store, bm25=bm25, embedder=embedder, llm=llm, cfg=cfg["rag"]),
-        KgApproach(graph=graph, ontology=ontology, llm=llm, cfg=cfg["kg"]),
-        WikiApproach(library=load_wiki(cfg), llm=llm, cfg=cfg["wiki"]),
-    ]
+    lab = build_lab(cfg)
+    if not lab.ready:
+        raise ArtefactMissing(lab.problem)
+    return list(lab.approaches)
 
 
 def ask(question: str, cfg: dict[str, Any]) -> list[Answer]:
@@ -39,16 +32,13 @@ def ask(question: str, cfg: dict[str, Any]) -> list[Answer]:
 def ask_all(cfg: dict[str, Any]) -> list[tuple[str, list[Answer]]]:
     # Artefacts load once and every question reuses them, which is also what
     # makes the per-question timings comparable to each other.
-    approaches = load_approaches(cfg)
+    lab = build_lab(cfg)
+    if not lab.ready:
+        raise ArtefactMissing(lab.problem)
     return [
-        (row["q"], [approach.answer(row["q"]) for approach in approaches])
-        for row in _questions(cfg)
+        (row["q"], [approach.answer(row["q"]) for approach in lab.approaches])
+        for row in lab.questions
     ]
-
-
-def _questions(cfg: dict[str, Any]) -> list[dict[str, Any]]:
-    raw = Path(cfg["paths"]["questions"]).read_text(encoding="utf-8")
-    return yaml.safe_load(raw)["questions"]
 
 
 def _render(question: str, answers: list[Answer]) -> str:
