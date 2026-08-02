@@ -75,6 +75,19 @@ weak retrievals. Without it, a nearest-neighbour shrug is indistinguishable from
 a real hit — which is RAG's most consequential failure mode, because vector
 search *always returns something*. A similarity score is never zero.
 
+The threshold turned out to be weaker than this design assumed, and the measured
+numbers are worth stating plainly. Against all-MiniLM-L6-v2, the unanswerable
+revenue question scores **cosine 0.466** — its nearest chunk is `person-lin-zhao`,
+a page about someone who tracks business signals. The lowest *genuinely*
+answerable demo question scores 0.480. A 0.014 margin is not a threshold, it is
+a coincidence, and the top1−top2 gap separates them no better. So the flag stays
+at `0.25`, where it catches nothing on this corpus, and the revenue question is
+answered confidently and wrongly. That is the honest result: **cosine cannot tell
+you the corpus does not contain the answer.** Non-negotiable #7 in `CLAUDE.md`
+describes exactly this, and the demo is stronger for it — the graph is what says
+"no path", and the scoreboard's admitted-ignorance row is where the difference
+shows up.
+
 Strengths and weaknesses both follow directly from the design. Nothing is
 precomputed beyond the index, so new documents are one re-embed away from being
 answerable. But it retrieves *passages*, so any answer requiring a join across
@@ -120,8 +133,28 @@ is an extraction bug, and catching it structurally beats catching it by eye.
                   how well its justifying path matches the cues
 ```
 
-Suggested scoring: `+2.5` per edge whose predicate matches a cue, `+1.5` per
-intermediate node whose type the question named, `−0.6` per hop.
+Scoring: `+2.5` per **distinct** cue the path matches, `+1.5` per **distinct**
+intermediate node type the question named, `−0.6` per hop. The answer type is
+excluded from that second bonus — it names the destination, not a waypoint.
+
+Both refinements were forced by the corpus, and each one is a trap worth knowing
+about. Scored *per edge*, the Beacon question is won by
+
+```
+Beacon -[depends on]-> Cinder -[depends on]-> Delta Store
+       <-[depends on]- Ember <-[governs]- Credential Rotation Standard
+```
+
+at 9.6, because three `depends on` edges collect `+2.5` apiece for a single word
+in the question, and three Services collect `+1.5` apiece for a single "service".
+Repeating one cue must not beat matching two, so cues count once each.
+
+Counting distinct types alone still fails, and fails more interestingly: the
+winner becomes **Data Retention Policy v2**, reached by walking through the v3
+that superseded it, because a `Policy` waypoint paid the named-type bonus for a
+question that asked for a Policy. That is the corpus's planted superseded
+reference doing precisely what it was planted to do. Excluding the answer type
+from the waypoint bonus fixes it, and the intended route then scores 6.2.
 
 So *"who fixed the bug in the service that Atlas depends on?"* seeds on `Atlas`,
 targets `Person`, cues `{fixed_by, depends_on}`, and the winning path —
