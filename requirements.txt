@@ -13,3 +13,7 @@ sentence-transformers>=2.7
 
 # Dev
 pytest>=8.0
+# fastapi's TestClient needs it. Listed explicitly because it otherwise only
+# arrives as a transitive dependency of sentence-transformers -- which the
+# comment above invites you to remove.
+httpx>=0.27
