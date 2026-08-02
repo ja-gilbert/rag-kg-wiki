@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import datetime as dt
 
 import pytest
@@ -120,3 +121,38 @@ def test_a_malformed_relationship_bullet_is_ignored_rather_than_guessed():
         _ENTITY.render().replace("- owned by [[Platform Team]]", "- something went wrong here")
     )
     assert page.relationships == (("depends on", "Ember"),)
+
+
+def test_the_body_is_prose_without_the_markdown_chrome():
+    body = _ENTITY.body()
+    assert _ENTITY.summary in body
+    assert "depends on [[Ember]]" in body
+    # None of this is something a reader reads, and all of it competes for
+    # selection when the page is handed to a generator.
+    assert "---" not in body
+    assert "title:" not in body
+    assert "page_type:" not in body
+    assert not any(line.startswith("#") for line in body.splitlines())
+
+
+def test_the_body_does_not_list_the_source_ids_as_prose():
+    # They travel as structured data on the evidence block; quoted back as a
+    # sentence they would read as an answer made of filenames.
+    assert "svc-atlas" not in _ENTITY.body()
+
+
+def test_the_body_is_not_the_rendered_page():
+    assert _ENTITY.body() != _ENTITY.render()
+
+
+def test_the_body_does_not_repeat_a_summary_the_prose_already_opens_with():
+    page = dataclasses.replace(
+        _ENTITY,
+        summary="Atlas terminates every external request.",
+        sections=(("What it is", "Atlas terminates every external request.\n\nIt fronts the estate."),),
+    )
+    assert page.body().count("Atlas terminates every external request.") == 1
+
+
+def test_a_topic_summary_survives_because_no_section_repeats_it():
+    assert _TOPIC.summary in _TOPIC.body()

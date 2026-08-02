@@ -53,6 +53,24 @@ class WikiPage:
                 )
         return ()
 
+    def body(self) -> str:
+        """The page as prose -- what a reader reads, without the markdown chrome.
+
+        `render()` is for the filesystem: frontmatter, an H1, headings, the
+        Sources list. Handing that to a generator makes the frontmatter block
+        compete for selection as though it were a sentence, and for a question
+        about Atlas it wins, because it contains "Atlas" four times. Headings
+        lose the same way -- "Who owns it" matches "who owns Atlas" strongly and
+        says nothing.
+        """
+        prose = [_readable(b) for _, b in self.sections if b.strip()]
+        # An entity page's summary is the first sentence of its primary source
+        # and its opening section is that source's first paragraph, so the two
+        # overlap. Leading with the summary anyway puts the same sentence in
+        # the answer twice, which reads as a stutter rather than as emphasis.
+        lead = [] if prose and prose[0].startswith(self.summary) else [self.summary]
+        return "\n\n".join(lead + prose)
+
     def section(self, heading: str) -> str | None:
         for name, body in self.sections:
             if name == heading:
@@ -113,6 +131,21 @@ class WikiPage:
                 if heading != _DERIVED_SECTION
             ),
         )
+
+
+def _readable(body: str) -> str:
+    """A section's text with bullet lists broken into separate paragraphs.
+
+    `split_sentences` collapses newlines inside a paragraph, because the corpus
+    is hard-wrapped and a line break there is a typesetting artefact. A bullet
+    list is the one place in a wiki page where that is wrong: left as it is,
+    twenty relationship bullets arrive as one enormous sentence, and anything
+    reading sentence by sentence has to take all twenty or none.
+    """
+    lines = [line.strip() for line in body.splitlines() if line.strip()]
+    if not all(line.startswith("- ") for line in lines):
+        return body
+    return "\n\n".join(line[2:] for line in lines)
 
 
 def _scalar(value: str) -> str:

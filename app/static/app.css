@@ -1,0 +1,568 @@
+/* kb-lab.
+   Instrument-panel-on-paper: three specimens measured under identical
+   conditions. Colour is signal, never fill -- each approach owns one hue that
+   appears as a 3px channel rule and a meter track, and nowhere else. Monospace
+   carries everything the machine produced (ids, scores, traces, citations);
+   the sans face carries only generated prose. That split is the fastest way to
+   see which parts of a column are evidence and which are language.
+
+   No web fonts, no CDN, no build step: this has to render on a plane. */
+
+:root {
+  --paper:  #f1f4f3;
+  --panel:  #ffffff;
+  --ink:    #14181a;
+  --muted:  #5a6663;
+  --rule:   #cbd4d1;
+  --track:  #e3e9e7;
+  --flag:   #8a5a00;
+  --flag-bg:#fbf3e2;
+
+  --rag:  #2f6fb0;
+  --kg:   #7a4ba0;
+  --wiki: #16786a;
+
+  --font-ui: "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui,
+             -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Mono", "Cascadia Code", ui-monospace, "SF Mono",
+               Menlo, Consolas, "Liberation Mono", monospace;
+
+  --gutter: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper:  #101414;
+    --panel:  #171c1c;
+    --ink:    #e6eae9;
+    --muted:  #93a09d;
+    --rule:   #2b3333;
+    --track:  #222a2a;
+    --flag:   #d9a441;
+    --flag-bg:#251d0c;
+
+    --rag:  #6ba6e0;
+    --kg:   #b489dc;
+    --wiki: #4fbfa8;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 var(--gutter) 64px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-weight: 600; margin: 0; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* --- masthead ---------------------------------------------------------- */
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 32px;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 26px 0 14px;
+}
+
+.wordmark {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.config div {
+  display: flex;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.config dt { color: var(--muted); opacity: 0.75; }
+.config dd { margin: 0; color: var(--ink); }
+
+/* --- banner ------------------------------------------------------------ */
+
+.banner {
+  max-width: 1500px;
+  margin: 0 auto 16px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--flag);
+  background: var(--flag-bg);
+  color: var(--flag);
+  font-size: 14px;
+}
+
+.banner code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* --- tabs -------------------------------------------------------------- */
+
+.tabs {
+  display: flex;
+  gap: 24px;
+  max-width: 1500px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tab {
+  padding: 8px 0 9px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tab.is-current { color: var(--ink); border-bottom-color: var(--ink); }
+.tab:disabled { opacity: 0.4; cursor: not-allowed; }
+
+main { max-width: 1500px; margin: 0 auto; }
+.panel { display: none; }
+.panel.is-current { display: block; }
+
+/* --- asking ------------------------------------------------------------ */
+
+.ask {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0 18px;
+}
+
+.ask input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+}
+
+.ask input::placeholder { color: var(--muted); }
+
+.ask button {
+  padding: 11px 22px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--panel);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ask button[disabled] { opacity: 0.45; cursor: progress; }
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.demos__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  padding: 6px 11px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.demo:hover { border-color: var(--ink); }
+
+/* The dot says which architecture this question is meant to favour --
+   questions.yaml calls that a hint for the UI, so it is shown, not hidden. */
+.demo__expect {
+  flex: none;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--channel, var(--muted));
+}
+
+.empty {
+  max-width: 62ch;
+  margin: 28px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* --- columns ----------------------------------------------------------- */
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 0 18px;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--channel);
+  border-radius: 2px;
+  background: var(--panel);
+}
+
+.column__head { padding: 13px 16px 0; }
+
+.column__label {
+  margin: 0 0 9px;
+  color: var(--channel);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.readout {
+  display: flex;
+  gap: 18px;
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.readout div { display: flex; align-items: baseline; gap: 6px; }
+.readout dt { color: var(--muted); font-size: 10.5px; letter-spacing: 0.04em; }
+.readout dd { margin: 0; }
+
+.readout__dot::before {
+  content: "";
+  display: inline-block;
+  width: 8px; height: 8px;
+  border: 1.5px solid var(--flag);
+  border-radius: 50%;
+}
+
+.readout__dot[data-confident="true"]::before {
+  border-color: var(--channel);
+  background: var(--channel);
+}
+
+.answer, .note, .trace, .evidence { padding: 0 16px; }
+
+.answer {
+  font-size: 15px;
+  line-height: 1.62;
+  text-wrap: pretty;
+}
+
+.answer:empty::after {
+  content: "No answer.";
+  color: var(--muted);
+}
+
+/* Citation markers the generator wrote. Buttons, not decoration: each one
+   opens the evidence block it points at. */
+.cite {
+  padding: 0 3px;
+  border: 0;
+  background: none;
+  color: var(--channel);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cite:hover { text-decoration: underline; }
+
+.note {
+  margin: 0;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  border-left: 3px solid var(--flag);
+  background: var(--flag-bg);
+  color: var(--flag);
+  font-size: 13.5px;
+}
+
+.trace__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* The trace really is a sequence -- the order is what it did, in order -- so
+   the numbering carries information rather than decorating the list. */
+.trace__steps li {
+  counter-increment: step;
+  display: flex;
+  gap: 9px;
+  padding: 2.5px 0;
+}
+
+.trace__steps li::before {
+  content: counter(step);
+  flex: none;
+  width: 1.4em;
+  color: var(--channel);
+  text-align: right;
+}
+
+/* Pushed to the foot of every column so the disclosure sits on one line across
+   all three, however much answer is above it. */
+.evidence { margin-top: auto; padding-top: 4px; }
+
+.evidence summary {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.evidence__blocks {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: block;
+}
+
+.evidence__blocks li {
+  counter-increment: block;
+  padding: 10px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.evidence__blocks li:first-child { border-top: 0; padding-top: 2px; }
+
+.block__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.block__number { color: var(--channel); }
+.block__title { color: var(--ink); }
+.block__score { color: var(--muted); margin-left: auto; }
+
+.block__text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.block__docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+/* Two-level provenance is the point: every id here opens the raw prose. */
+.doc {
+  padding: 2px 6px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.doc:hover { border-color: var(--channel); color: var(--channel); }
+
+.column[data-approach="rag"]  { --channel: var(--rag); }
+.column[data-approach="kg"]   { --channel: var(--kg); }
+.column[data-approach="wiki"] { --channel: var(--wiki); }
+
+/* --- the scoreboard ---------------------------------------------------- */
+
+.board {
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+
+.board__rows { display: flex; flex-direction: column; gap: 14px; }
+
+.metric {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.1fr) repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: center;
+}
+
+.metric__label { font-size: 13px; color: var(--muted); }
+
+/* Value first, then the bar. With the value on the right it sits closer to the
+   next column's bar than to its own, and the whole row stops being readable. */
+.gauge { display: flex; align-items: center; gap: 9px; }
+
+.gauge__track {
+  flex: 1;
+  min-width: 0;
+  height: 6px;
+  background: var(--track);
+  border-radius: 1px;
+}
+
+.gauge__fill {
+  height: 100%;
+  min-width: 2px;
+  border-radius: 1px;
+  background: var(--channel);
+  transform-origin: left center;
+}
+
+.gauge__value {
+  flex: none;
+  min-width: 7ch;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: right;
+}
+
+.gauge__mark {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gauge__mark[data-on="true"] { color: var(--channel); }
+
+.gauge[data-approach="rag"]  { --channel: var(--rag); }
+.gauge[data-approach="kg"]   { --channel: var(--kg); }
+.gauge[data-approach="wiki"] { --channel: var(--wiki); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .gauge__fill { animation: extend 420ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+  @keyframes extend { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+}
+
+/* --- the raw source, one click from any citation ----------------------- */
+
+.source {
+  width: min(760px, 92vw);
+  max-height: 82vh;
+  padding: 0 26px 26px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.source::backdrop { background: rgb(10 16 16 / 0.45); }
+
+.source form { display: flex; justify-content: flex-end; position: sticky; top: 0; }
+
+.source__close {
+  margin: 8px -12px 0 0;
+  padding: 4px 10px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.source__title { font-size: 18px; }
+
+.source__meta {
+  margin: 4px 0 16px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.source__text {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+/* --- narrow ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .columns { grid-template-columns: 1fr; }
+  .metric { grid-template-columns: 1fr; gap: 6px; }
+  .metric__label { font-size: 12px; }
+}

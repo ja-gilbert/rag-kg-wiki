@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kb-lab — one question, three architectures</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead__name">
+    <span class="wordmark">kb&#8202;/&#8202;lab</span>
+    <p class="tagline">One question, three architectures, the same generator.</p>
+  </div>
+  <dl class="config" id="config" aria-label="Configuration that produced these answers"></dl>
+</header>
+
+<p class="banner" id="banner" role="status" hidden></p>
+
+<nav class="tabs" aria-label="Views">
+  <button class="tab is-current" data-panel="compare" aria-current="page">Compare</button>
+  <button class="tab" data-panel="graph" disabled title="Arrives in step 9c">Graph</button>
+  <button class="tab" data-panel="wiki" disabled title="Arrives in step 9d">Wiki</button>
+  <button class="tab" data-panel="sources" disabled title="Arrives in step 9d">Sources</button>
+</nav>
+
+<main>
+  <section class="panel is-current" id="panel-compare">
+
+    <form class="ask" id="ask">
+      <label class="visually-hidden" for="question">Question</label>
+      <input id="question" name="question" type="text" autocomplete="off" spellcheck="false"
+             placeholder="Ask the corpus something">
+      <button type="submit" id="ask-button">Ask</button>
+    </form>
+
+    <section class="demos" aria-label="Demo questions">
+      <h2 class="eyebrow">Ten questions, each chosen to break something</h2>
+      <ul class="demos__list" id="demos"></ul>
+    </section>
+
+    <p class="empty" id="empty">
+      Pick a question, or write your own. Every demo question is here because it makes one
+      architecture look good and at least one other look bad, for a reason you can explain.
+    </p>
+
+    <!-- One template, rendered three times. The columns are structurally
+         identical by construction rather than by discipline: a section added
+         for one approach is a section added for all three. -->
+    <template id="column-template">
+      <article class="column">
+        <header class="column__head">
+          <p class="column__label"></p>
+          <dl class="readout">
+            <div><dt>took</dt><dd class="readout__ms"></dd></div>
+            <div><dt>evidence</dt><dd class="readout__tokens"></dd></div>
+            <div><dt>confident</dt><dd class="readout__dot"></dd></div>
+          </dl>
+        </header>
+
+        <div class="answer"></div>
+
+        <p class="note" hidden></p>
+
+        <section class="trace">
+          <h3 class="eyebrow">What it did</h3>
+          <ol class="trace__steps"></ol>
+        </section>
+
+        <details class="evidence">
+          <summary><span class="evidence__count"></span></summary>
+          <ol class="evidence__blocks"></ol>
+        </details>
+      </article>
+    </template>
+
+    <div class="columns" id="columns"></div>
+
+    <section class="board" id="board" hidden>
+      <h2 class="eyebrow">What each architecture spent — same scale across all three</h2>
+      <div class="board__rows" id="board-rows"></div>
+    </section>
+
+  </section>
+</main>
+
+<dialog class="source" id="source">
+  <form method="dialog"><button class="source__close" aria-label="Close">&times;</button></form>
+  <h2 class="source__title"></h2>
+  <p class="source__meta"></p>
+  <pre class="source__text"></pre>
+</dialog>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
