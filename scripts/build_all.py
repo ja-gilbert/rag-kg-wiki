@@ -7,11 +7,12 @@ from core.config import DEFAULT_CONFIG_PATH, load_config
 from scripts.artefacts import BuildStats
 from scripts.build_graph import build_graph
 from scripts.build_index import build_index
+from scripts.build_wiki import build_wiki
 
-# The wiki joins this list in step 8. Its build cost is the interesting one --
-# minutes rather than seconds -- and the point of the table is that the
-# asymmetry is visible before anyone asks a question.
-_BUILDERS = (build_index, build_graph)
+# The asymmetry between these three is the point of the table: RAG embeds in
+# seconds, the graph extracts in less, and the wiki does its synthesis once at
+# build time instead of on every query the way RAG does.
+_BUILDERS = (build_index, build_graph, build_wiki)
 
 _HEADINGS = ("approach", "artefact", "items", "seconds", "notes")
 

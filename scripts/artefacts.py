@@ -10,6 +10,7 @@ from core.vectorstore import BM25Index, VectorStore
 from kgraph.extract import Triple
 from kgraph.graph import KnowledgeGraph
 from kgraph.ontology import Ontology
+from wikigen.library import WikiLibrary
 
 BUILD_COMMAND = "python -m scripts.build_all"
 
@@ -67,3 +68,12 @@ def load_kg(cfg: dict[str, Any]) -> tuple[KnowledgeGraph, Ontology]:
     ontology = Ontology.load(cfg["paths"]["ontology"])
     triples = [Triple(**row) for row in json.loads(path.read_text(encoding="utf-8"))]
     return KnowledgeGraph(triples, ontology), ontology
+
+
+def load_wiki(cfg: dict[str, Any]) -> WikiLibrary:
+    try:
+        return WikiLibrary.load(cfg["paths"]["wiki"])
+    except FileNotFoundError as exc:
+        raise ArtefactMissing(
+            f"No compiled wiki at {cfg['paths']['wiki']}. Run `{BUILD_COMMAND}` first."
+        ) from exc
