@@ -193,10 +193,11 @@ def _page_dict(page: WikiPage) -> dict[str, Any]:
         "summary": page.summary,
         "doc_ids": list(page.sources),
         # Whole pages, not fragments. The page is the unit the compiler wrote
-        # and the unit a reader would open.
-        "text": page.render(),
+        # and the unit a reader would open -- but its prose, not its
+        # frontmatter: see WikiPage.body().
+        "text": page.body(),
     }
 
 
 def _evidence(pages: list[WikiPage]) -> list[Evidence]:
-    return [Evidence(citation=page.title, text=page.render()) for page in pages]
+    return [Evidence(citation=page.title, text=page.body()) for page in pages]

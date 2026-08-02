@@ -101,9 +101,13 @@ def test_max_pages_caps_the_evidence(library):
 
 
 def test_evidence_is_whole_pages_not_fragments(library):
+    # The whole page's prose, not a chunk of it -- and not its frontmatter
+    # either, which is filesystem bookkeeping rather than something a reader
+    # reads. That is the difference from RAG: the unit is the page.
     page = _wiki(library).answer(_FIT_TOGETHER).evidence[0]
     whole = library.page(page["title"])
-    assert page["text"] == whole.render()
+    assert page["text"] == whole.body()
+    assert whole.summary in page["text"]
 
 
 # --------------------------------------------------------------------------
@@ -171,3 +175,22 @@ def test_the_trace_says_what_it_did_in_plain_english(library):
 def test_the_timing_covers_scanning_and_reading(library):
     ms = _wiki(library).answer(_FIT_TOGETHER).ms
     assert {"scan", "read", "generate", "total"} <= set(ms)
+
+
+def test_the_answer_is_prose_and_not_the_page_frontmatter(library):
+    # Found by reading real output, not by a unit test: the approach used to
+    # hand `page.render()` to the generator, so the frontmatter block competed
+    # for selection as a sentence -- and for a question naming Atlas it won,
+    # because the block contains "Atlas" in the title and in every source id.
+    answer = _wiki(library).answer("Who owns Atlas and what does it depend on?")
+    assert not answer.answer.lstrip().startswith("---")
+    for chrome in ("title:", "page_type:", "entity_type:", "updated:"):
+        assert chrome not in answer.answer
+
+
+def test_the_evidence_blocks_are_prose_too(library):
+    # What the generator saw and what the UI shows have to be the same text,
+    # or the evidence panel stops explaining where the answer came from.
+    for block in _wiki(library).answer(_FIT_TOGETHER).evidence:
+        assert "---" not in block["text"]
+        assert "page_type:" not in block["text"]
