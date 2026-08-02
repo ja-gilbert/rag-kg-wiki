@@ -47,6 +47,15 @@ class WikiLibrary:
             pages[page.title] = page
         return cls(_parse_index(index.read_text(encoding="utf-8")), pages)
 
+    @property
+    def titles(self) -> tuple[str, ...]:
+        """Every page actually on disk -- which is not the same set as `entries`.
+
+        The index and the page directory disagreeing is one of the things lint
+        looks for, so the two have to stay separately readable.
+        """
+        return tuple(sorted(self._pages))
+
     def page(self, title: str) -> WikiPage:
         return self._pages[title]
 
