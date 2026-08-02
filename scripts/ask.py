@@ -10,9 +10,10 @@ import yaml
 from approaches.base import Answer, Approach
 from approaches.kg import KgApproach
 from approaches.rag import RagApproach
+from approaches.wiki import WikiApproach
 from core.config import DEFAULT_CONFIG_PATH, load_config
 from core.llm import build_llm
-from scripts.artefacts import ArtefactMissing, load_kg, load_rag
+from scripts.artefacts import ArtefactMissing, load_kg, load_rag, load_wiki
 
 
 def load_approaches(cfg: dict[str, Any]) -> list[Approach]:
@@ -27,6 +28,7 @@ def load_approaches(cfg: dict[str, Any]) -> list[Approach]:
     return [
         RagApproach(store=store, bm25=bm25, embedder=embedder, llm=llm, cfg=cfg["rag"]),
         KgApproach(graph=graph, ontology=ontology, llm=llm, cfg=cfg["kg"]),
+        WikiApproach(library=load_wiki(cfg), llm=llm, cfg=cfg["wiki"]),
     ]
 
 

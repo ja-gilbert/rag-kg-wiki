@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import urllib.request
 from dataclasses import dataclass
 from typing import Any, Sequence
 
 from core.corpus import split_sentences
+from core.text import terms
 
 # One backend interface and one prompt for all three approaches (non-negotiable
 # #5). Whatever differs on screen has to be a difference in the evidence the
@@ -51,23 +51,6 @@ def build_prompt(question: str, evidence: Sequence[Evidence]) -> str:
 # extractive
 # --------------------------------------------------------------------------
 
-# Question words and glue carry no retrieval signal, and leaving them in would
-# score every sentence containing "the" as a partial match.
-_STOPWORDS = frozenset(
-    """
-    a an and are as at be by did do does for from has have how in into is it its
-    of on or that the their there they this to was were what when where which
-    who whom whose why will with
-    """.split()
-)
-
-_WORD = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]*")
-
-
-def _terms(text: str) -> set[str]:
-    return {w.lower() for w in _WORD.findall(text)} - _STOPWORDS
-
-
 class ExtractiveBackend:
     """Ranks evidence sentences against the question and stitches them together.
 
@@ -92,13 +75,13 @@ class ExtractiveBackend:
         if not evidence:
             return NO_EVIDENCE_TEXT
 
-        asked = _terms(question)
+        asked = terms(question)
         # Position is kept so the survivors can be re-sorted into reading order:
         # ranking decides what is said, the retriever decides in what order.
         scored: list[tuple[int, int, str, int]] = []
         for number, item in enumerate(evidence, 1):
             for position, sentence in enumerate(split_sentences(item.text)):
-                overlap = len(asked & _terms(sentence))
+                overlap = len(asked & terms(sentence))
                 scored.append((overlap, number, sentence, position))
 
         # Sort by score, then by the order the evidence arrived in, so ties

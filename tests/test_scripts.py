@@ -20,6 +20,7 @@ CONFIG = ROOT / "config.yaml"
 def cfg(tmp_path):
     built = load_config(CONFIG)
     built["paths"]["build"] = str(tmp_path / "build")
+    built["paths"]["wiki"] = str(tmp_path / "wiki")
     # The hash backend carries no semantics, which is fine here: these tests are
     # about artefacts existing and loading, not about retrieval quality, and it
     # keeps the suite off the 80MB model download path.
@@ -65,16 +66,17 @@ def test_build_all_produces_every_artefact(cfg):
     build = Path(cfg["paths"]["build"])
     assert (build / "triples.json").exists()
     assert list(build.glob("index/*"))
+    assert (Path(cfg["paths"]["wiki"]) / "index.md").exists()
 
 
 def test_build_all_reports_one_row_per_approach(cfg):
     rows = build_all(cfg)
-    assert {row.approach for row in rows} == {"rag", "kg"}
+    assert {row.approach for row in rows} == {"rag", "kg", "wiki"}
 
 
 def test_the_summary_reports_what_each_build_cost(cfg):
     table = summary_table(build_all(cfg))
-    assert "rag" in table and "kg" in table
+    assert "rag" in table and "kg" in table and "wiki" in table
     # The asymmetry is the finding: it belongs on screen, not in a comment.
     assert "seconds" in table.lower() or "s" in table
 
@@ -107,7 +109,7 @@ def test_a_missing_artefact_is_not_a_stack_trace_about_npy(cfg):
 
 def test_ask_answers_with_every_approach(built):
     answers = ask("Who fixed the bug in the service that Atlas depends on?", built)
-    assert [a.approach for a in answers] == ["rag", "kg"]
+    assert [a.approach for a in answers] == ["rag", "kg", "wiki"]
 
 
 def test_every_answer_fills_the_shared_envelope(built):
