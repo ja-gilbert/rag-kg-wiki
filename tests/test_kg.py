@@ -174,9 +174,30 @@ def test_the_no_path_note_names_what_it_did_find(ontology):
 # --------------------------------------------------------------------------
 
 
-def test_evidence_is_one_block_per_path(ontology):
-    answer = _kg(ontology).answer(_THE_QUESTION)
-    assert len(answer.evidence) == len(answer.detail["candidates"])
+def test_only_the_winning_path_is_asserted_as_evidence(ontology):
+    # Runners-up stay in `detail`, scored. Handing them to the generator makes
+    # them part of the answer, which turns one name into six chained paths.
+    triples = _ROUTES + [
+        _triple("BUG-903", "reported_by", "Priya Raman", doc_id="bug-903"),
+    ]
+    answer = _kg(ontology, triples=triples).answer(_THE_QUESTION)
+    assert len(answer.detail["candidates"]) == 2
+    assert len(answer.evidence) == 1
+    assert answer.evidence[0]["entity"] == "Marcus Chen"
+
+
+def test_a_runner_up_does_not_reach_the_citations(ontology):
+    triples = _ROUTES + [
+        _triple("BUG-903", "reported_by", "Priya Raman", doc_id="person-priya-raman"),
+    ]
+    answer = _kg(ontology, triples=triples).answer(_THE_QUESTION)
+    assert "person-priya-raman" not in answer.citations
+
+
+def test_a_neighbourhood_answer_keeps_every_neighbour_as_evidence(ontology):
+    # The list *is* the answer here, so nothing is a runner-up.
+    answer = _kg(ontology).answer("Which people are within two hops of BUG-903?")
+    assert len(answer.evidence) == len(answer.detail["neighbours"])
 
 
 def test_every_hop_of_the_evidence_quotes_its_sentence(ontology):

@@ -61,11 +61,19 @@ class KgApproach(Approach):
                 candidates = self._candidates(plan)
                 blocks = [_candidate_dict(c) for c in candidates]
 
+        # A neighbourhood query's whole answer is the list, but a path query has
+        # one answer and some runners-up: handing all six to the generator makes
+        # the runners-up part of the answer, which on the real corpus turns
+        # "Marcus Chen" into six chained paths citing ten documents. The losers
+        # stay visible in `detail`, scored, which is where they are auditable
+        # without being asserted.
+        shown = blocks if plan.hops is not None else blocks[:1]
+
         with timer.phase("generate"):
             # No path means no evidence, and an empty prompt is precisely where
             # a live model answers from its own memory instead of from the
             # corpus. The graph declining is the demo; don't hand it away.
-            generation = self._llm.generate(question, _evidence(blocks)) if blocks else None
+            generation = self._llm.generate(question, _evidence(shown)) if shown else None
 
         detail = {
             "query": "neighbourhood" if plan.hops is not None else "path",
@@ -91,12 +99,12 @@ class KgApproach(Approach):
             approach=self.name,
             label=self.label,
             answer=generation.text if generation else self._no_path_text(plan),
-            evidence=blocks,
-            citations=_citations(blocks),
+            evidence=shown,
+            citations=_citations(shown),
             trace=self._trace(plan, blocks),
             detail=detail,
             ms=timer.ms(),
-            tokens_est=estimate_tokens(b["text"] for b in blocks),
+            tokens_est=estimate_tokens(b["text"] for b in shown),
             confident=confident,
             note=note,
         )
