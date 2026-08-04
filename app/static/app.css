@@ -22,6 +22,20 @@
   --kg:   #7a4ba0;
   --wiki: #16786a;
 
+  /* Entity types, for the graph canvas. A categorical scale is a different job
+     from the three channel hues -- here the colour says what kind of thing a
+     node is, which is the one piece of the ontology worth carrying visually.
+     Kept in CSS rather than in JS so both themes are declared in one place and
+     the canvas reads them back at paint time. */
+  --t-service:  #2f6fb0;
+  --t-person:   #b05a24;
+  --t-team:     #16786a;
+  --t-incident: #b23a48;
+  --t-bug:      #7a4ba0;
+  --t-policy:   #55606b;
+  --t-vendor:   #8a7a1f;
+  --t-runbook:  #3f7d3a;
+
   --font-ui: "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui,
              -apple-system, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "Cascadia Mono", "Cascadia Code", ui-monospace, "SF Mono",
@@ -44,6 +58,15 @@
     --rag:  #6ba6e0;
     --kg:   #b489dc;
     --wiki: #4fbfa8;
+
+    --t-service:  #6ba6e0;
+    --t-person:   #e0925c;
+    --t-team:     #4fbfa8;
+    --t-incident: #e07785;
+    --t-bug:      #b489dc;
+    --t-policy:   #97a4b0;
+    --t-vendor:   #c9b757;
+    --t-runbook:  #79c471;
   }
 }
 
@@ -160,6 +183,19 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
 
 .tab.is-current { color: var(--ink); border-bottom-color: var(--ink); }
 .tab:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* A question that produced a route through the graph puts a mark on the Graph
+   tab. The picture is the payoff of the whole demo and it is one tab away;
+   without this nobody clicks through to it. */
+.tab[data-lit="true"]::after {
+  content: "";
+  display: inline-block;
+  width: 5px; height: 5px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--kg);
+  vertical-align: 2px;
+}
 
 main { max-width: 1500px; margin: 0 auto; }
 .panel { display: none; }
@@ -515,6 +551,246 @@ main { max-width: 1500px; margin: 0 auto; }
   @keyframes extend { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 }
 
+/* --- the graph tab ----------------------------------------------------- */
+
+.graph {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.graph__stage {
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--kg);
+  border-radius: 2px;
+  background: var(--panel);
+}
+
+.graph__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 13px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.legend li { display: flex; align-items: center; gap: 5px; }
+
+.swatch {
+  flex: none;
+  width: 8px; height: 8px;
+  border: 1.5px solid var(--channel, var(--muted));
+  border-radius: 50%;
+}
+
+.graph__count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ghost {
+  padding: 4px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+/* An explicit height, because the canvas has to be sized in device pixels by
+   the script and a canvas with no CSS height reports its 150px default. */
+#graph-canvas {
+  display: block;
+  width: 100%;
+  height: min(64vh, 640px);
+  touch-action: none;
+}
+
+.graph__hint {
+  margin: 0;
+  padding: 9px 14px;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* --- the inspector ----------------------------------------------------- */
+
+.inspect {
+  padding: 14px 16px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--panel);
+  max-height: min(74vh, 740px);
+  overflow-y: auto;
+}
+
+.inspect .ghost { margin-bottom: 12px; }
+
+.inspect__kind {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.inspect__name { margin: 1px 0 0; font-size: 17px; }
+
+.inspect__meta {
+  margin: 3px 0 12px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.index { margin: 0; padding: 0; list-style: none; }
+
+.index li {
+  padding: 9px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.index li:first-child { border-top: 0; padding-top: 0; }
+
+.index__type {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.index li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.index__names { display: flex; flex-wrap: wrap; gap: 4px; width: 100%; }
+
+/* Every entity name anywhere on this tab is the same control: click it and the
+   inspector moves there. Tinted by its type so the canvas legend and the text
+   beside it are reading off one scale. */
+.entity {
+  padding: 2px 7px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.entity:hover { border-color: var(--channel, var(--ink)); color: var(--channel, var(--ink)); }
+
+.facts { margin: 0; padding: 0; list-style: none; }
+
+.facts li {
+  padding: 11px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.facts li:first-child { border-top: 0; }
+
+.fact__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 6px;
+}
+
+.fact__self {
+  padding: 2px 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.fact__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--kg);
+}
+
+.fact__sentence {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* In a list of facts the sentence is supporting detail; on its own it is the
+   evidence, so it gets to be read rather than skimmed. */
+.fact__sentence--tight {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.facts .block__docs { margin-top: 7px; }
+
+/* --- the route that answered ------------------------------------------- */
+
+.lit {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--kg);
+  border-radius: 2px;
+  background: var(--panel);
+}
+
+.lit .eyebrow { margin-bottom: 9px; text-transform: none; letter-spacing: 0.04em; }
+.lit__question { color: var(--ink); }
+
+.lit__routes { margin: 0; padding: 0; list-style: none; }
+
+.lit__routes li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 0;
+}
+
+.lit__none {
+  color: var(--flag);
+  font-size: 13.5px;
+}
+
+.hop {
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  color: var(--kg);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.hop:hover { text-decoration: underline; }
+
 /* --- the raw source, one click from any citation ----------------------- */
 
 .source {
@@ -565,4 +841,7 @@ main { max-width: 1500px; margin: 0 auto; }
   .columns { grid-template-columns: 1fr; }
   .metric { grid-template-columns: 1fr; gap: 6px; }
   .metric__label { font-size: 12px; }
+  .graph { grid-template-columns: 1fr; }
+  .inspect { max-height: none; }
+  #graph-canvas { height: 58vh; }
 }

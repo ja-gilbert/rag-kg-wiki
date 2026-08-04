@@ -30,6 +30,7 @@ async function boot() {
 
   const { questions } = await getJSON("/api/questions");
   renderDemos(questions, status.ready);
+  wireTabs();
 
   el("ask").addEventListener("submit", (event) => {
     event.preventDefault();
@@ -40,6 +41,33 @@ async function boot() {
     el("question").disabled = true;
     el("ask-button").disabled = true;
   }
+}
+
+/* The tabs, and the only two things the shell tells the other tabs about: which
+   panel is showing, and what the last question turned up. Broadcast as events
+   rather than called directly, so this file never has to know which tabs have
+   been built -- adding one is adding a listener, not editing this function. */
+function wireTabs() {
+  for (const tab of document.querySelectorAll(".tab")) {
+    tab.addEventListener("click", () => showPanel(tab.dataset.panel));
+  }
+}
+
+function showPanel(name) {
+  for (const tab of document.querySelectorAll(".tab")) {
+    const current = tab.dataset.panel === name;
+    tab.classList.toggle("is-current", current);
+    if (current) tab.setAttribute("aria-current", "page");
+    else tab.removeAttribute("aria-current");
+  }
+  for (const panel of document.querySelectorAll(".panel")) {
+    panel.classList.toggle("is-current", panel.id === `panel-${name}`);
+  }
+  announce("panel", { name });
+}
+
+function announce(topic, detail) {
+  document.dispatchEvent(new CustomEvent(`kb-lab:${topic}`, { detail }));
 }
 
 function renderConfig(status) {
@@ -109,6 +137,7 @@ async function ask(question) {
     el("empty").hidden = true;
     renderColumns(body.answers);
     renderBoard(body.scoreboard);
+    announce("answered", { question: asked, answers: body.answers });
   } catch (error) {
     showFailure(error);
   } finally {
