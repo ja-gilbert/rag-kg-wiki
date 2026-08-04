@@ -363,12 +363,32 @@ def test_every_script_the_page_loads_is_actually_served(client):
         assert client.get(path).status_code == 200, path
 
 
-def test_the_page_declares_the_tabs_that_are_still_to_come(client):
-    # Compare and graph are built; the other two are marked as unbuilt rather
-    # than quietly missing, so the shape of the finished UI is visible.
+def test_the_page_declares_every_tab_and_none_are_disabled(client):
     body = client.get("/").text
     for panel in ("compare", "graph", "wiki", "sources"):
         assert f'data-panel="{panel}"' in body
+    assert "disabled" not in body, "a tab is still marked unbuilt"
+
+
+def test_no_two_scripts_declare_the_same_global():
+    """The one failure mode a seven-file frontend with no modules really has.
+
+    Every script shares one global scope, so a `const` in a later file that
+    collides with a `function` in an earlier one is a SyntaxError that stops
+    the later file loading -- silently, as far as the server is concerned, and
+    the tab it powers simply never works. Caught here rather than in front of
+    an audience.
+    """
+    owners: dict[str, list[str]] = {}
+    for script in sorted(STATIC.glob("*.js")):
+        text = script.read_text(encoding="utf-8")
+        declared = re.findall(r"^(?:async )?function (\w+)", text, re.M)
+        declared += re.findall(r"^(?:const|let|class) (\w+)", text, re.M)
+        for name in declared:
+            owners.setdefault(name, []).append(script.name)
+
+    clashes = {name: files for name, files in owners.items() if len(files) > 1}
+    assert not clashes, f"declared twice at global scope: {clashes}"
 
 
 # --------------------------------------------------------------------------
@@ -427,3 +447,69 @@ def test_the_answering_path_names_edges_that_are_really_in_the_graph(answered, c
             assert (source, hop["predicate"], target) in edges, hop
             # Non-negotiable #8 again: clicking a lit hop has to reach prose.
             assert hop["sentence"].strip() and hop["doc_id"]
+
+
+# --------------------------------------------------------------------------
+# the wiki and sources tabs
+# --------------------------------------------------------------------------
+
+
+def test_the_wiki_and_sources_tabs_have_somewhere_to_render(client):
+    body = client.get("/").text
+    for anchor in (
+        'id="panel-wiki"',
+        'id="panel-sources"',
+        'id="catalogue"',
+        'id="page"',
+        'id="doc-index"',
+        'id="raw"',
+        'id="lint-run"',
+        'id="read-trail"',
+    ):
+        assert anchor in body, anchor
+
+
+def test_every_wiki_page_links_only_to_pages_that_exist(client):
+    """The wiki tab turns `[[links]]` into buttons, so a dangling one is a dead
+    control. Lint has a broken_links check for the same reason, but that runs
+    on demand -- this runs on every commit.
+    """
+    titles = {page["title"] for page in client.get("/api/wiki").json()["pages"]}
+    assert len(titles) >= 30
+
+    for title in titles:
+        page = client.get(f"/api/wiki/{title}").json()
+        assert set(page["links"]) <= titles, (title, set(page["links"]) - titles)
+        assert set(page["backlinks"]) <= titles
+        # Non-negotiable #8: a page says which raw documents it came from, and
+        # the tab makes each one openable.
+        assert page["sources"], f"{title} cites no source document"
+
+
+def test_every_citation_in_wiki_prose_resolves_to_a_real_document(client):
+    """The tab only linkifies a `(doc-id)` when the page really cites it, so
+    an ordinary parenthesis is never dressed up as provenance. That rule is
+    only worth anything if the ids the compiler writes are genuine.
+    """
+    known = {row["doc_id"] for row in client.get("/api/sources").json()["documents"]}
+    assert len(known) == 39
+
+    checked = 0
+    for page in client.get("/api/wiki").json()["pages"]:
+        body = client.get(f"/api/wiki/{page['title']}").json()
+        prose = "\n".join(section["body"] for section in body["sections"])
+        for cited in re.findall(r"\(([a-z0-9-]+)\)", prose):
+            if cited not in known:
+                continue  # an ordinary parenthetical, left as plain text
+            assert cited in body["sources"], f"{page['title']} cites unlisted {cited}"
+            checked += 1
+    assert checked, "no document citations found in any page -- has the format changed?"
+
+
+def test_the_lint_report_carries_what_the_tab_groups_by(client):
+    report = client.get("/api/lint").json()
+    assert report["page_count"] >= 30
+    assert isinstance(report["ok"], bool)
+    for finding in report["findings"]:
+        assert finding["severity"] in {"error", "warning"}
+        assert finding["check"] and finding["subject"] and finding["detail"]
