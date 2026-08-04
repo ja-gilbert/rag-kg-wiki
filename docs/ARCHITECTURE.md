@@ -288,7 +288,7 @@ other.
 | `orphan_pages` | pages nothing links to |
 | `broken_links` | `[[Targets]]` resolving to nothing — usually a casing bug |
 | `contradictions` | two objects for a functional predicate (`owned_by`, `led_by`, `caused_by`, `supersedes`) |
-| `stale_pages` | newest source older than `wiki.stale_after_days` |
+| `stale_pages` | newest source more than `wiki.stale_after_days` behind the corpus |
 | `superseded_refs` | citing Data Retention Policy **v2** without saying it's superseded |
 | `coverage_gaps` | raw documents no page cites |
 | `index_drift` | `index.md` and `wiki/pages/` disagreeing |
@@ -296,6 +296,11 @@ other.
 `superseded_refs` earns its keep. Confidently answering from a document that has
 been replaced is the most dangerous failure mode any knowledge base has, and the
 corpus contains a planted instance of it.
+
+Staleness is measured against the corpus's own most recent document, not against
+today. "This page was left behind while the rest of the wiki moved on" is the
+thing worth reporting; against the wall clock, a fixed corpus turns every page
+stale the moment it stops being updated, and marks a different set every day.
 
 ---
 

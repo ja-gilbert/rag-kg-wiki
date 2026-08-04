@@ -62,9 +62,13 @@ questions:
   - q: "What was Meridian Systems' revenue last quarter?"
     expect: none
     why: >
-      Not in the corpus. Watch the three failure modes side by side: RAG returns
-      low-scoring chunks about anything numeric, the graph returns no path and
-      says so cleanly, the wiki reports no page found. This is the honesty test.
+      Not in the corpus. Watch the three failure modes side by side, because
+      only one of them is honest. RAG answers confidently: its top chunk scores
+      0.466, which is no lower than the questions it gets right, so no threshold
+      separates this from a real question. The wiki returns pages too, having
+      matched on "Meridian" and "system" and nothing else. Only the graph finds
+      no entity to start from, and says so. Two of the three fail the honesty
+      test, and that is the point.
 
   - q: "Which team is paged for a login failure they cannot fix?"
     expect: tie
