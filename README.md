@@ -9,8 +9,11 @@ where it quietly failed.
 
 Runs entirely on `localhost`. No API keys required.
 
-> **Status: corpus and design only.** No code yet — this is being built in
-> deliberate steps. `docs/ARCHITECTURE.md` describes the design.
+> **Status: all three approaches work, and the compare view is live.** Build the
+> artefacts, run the server, and `localhost:8000` answers any of the ten demo
+> questions in three columns with a scoreboard underneath. The graph, wiki and
+> sources tabs are still to come. `docs/ARCHITECTURE.md` describes the design
+> and the reasoning behind it.
 
 ---
 
@@ -58,9 +61,16 @@ can explain**:
 | What has repeatedly gone wrong with our vendors? | wiki | Two vendors, two incidents, one policy, one standing rule. Pre-compiled and backlinked. |
 | **What was Meridian Systems' revenue last quarter?** | *none* | Not in the corpus. The honesty test — watch all three fail differently. |
 
-That last one is the most useful thing in the repo. RAG returns confident-looking
-chunks about anything numeric. The graph finds no path and says so. The wiki
-reports no page. Same ignorance, three very different presentations of it.
+That last one is the most useful thing in the repo, and it did not turn out the
+way the design predicted. RAG answers it confidently: the top chunk scores
+**0.466**, no lower than the questions RAG gets *right*, so no threshold
+separates them. The wiki returns pages too — it matched on "Meridian" and
+"system" and nothing else, which it says out loud. Only the graph finds no
+entity to start from and declines.
+
+Two of the three fail the honesty test. That is more useful than a tidy demo
+where all three shrug politely, and it is why the threshold was left alone
+rather than tuned until the numbers behaved.
 
 ---
 
@@ -97,34 +107,68 @@ must remember the exact sentence it came from so it can be audited in the UI.
 ./setup.sh           # macOS / Linux
 ```
 
-That creates `.venv` and installs dependencies. There's nothing to run yet.
+That creates `.venv` and installs dependencies. Then build the artefacts once
+and start the server:
+
+```bash
+python -m scripts.build_all     # embeds chunks, extracts triples, compiles the wiki
+python -m app.main              # http://localhost:8000
+```
+
+`build_all` prints what each approach cost to build, which is half the
+comparison:
+
+```
+rag    16.5s   1 index      (15.2s of it loading the embedding model)
+kg      0.3s   64 edges
+wiki    0.2s   36 pages
+```
+
+The first build downloads a ~80MB embedding model. After that everything runs
+offline — set `embedding.backend: tfidf-svd` in `config.yaml` if you would
+rather skip the download entirely.
+
+### Without the browser
+
+```bash
+python -m scripts.ask "Who fixed the bug in the service that Atlas depends on?"
+python -m scripts.ask --all     # every demo question, all three approaches
+python -m scripts.lint          # check the compiled wiki; exits non-zero on errors
+```
 
 ---
 
-## What's here now
+## What's here
 
 ```
-docs/ARCHITECTURE.md      the design and the reasoning behind it
 config.yaml               every knob the three approaches disagree about
-requirements.txt          intended dependency set
-setup.ps1 / setup.sh      create .venv and install dependencies
 data/
   raw/*.txt               39 source documents  (immutable, never edited)
   ontology.yaml           entity types, aliases, relation patterns
   questions.yaml          the demo questions, and why each one matters
+core/                     corpus loading, chunking, embeddings, vector store, LLM adapter
+kgraph/                   relation extraction with provenance, graph traversal
+wikigen/                  wiki compiler, page format, library, journal, lint
+approaches/               rag.py, kg.py, wiki.py -- one Answer contract, one generator
+app/                      FastAPI + vanilla-JS frontend, no build step
+scripts/                  build_index, build_graph, build_wiki, build_all, ask, lint
+tests/                    344 tests
+docs/ARCHITECTURE.md      the design and the reasoning behind it
 ```
 
-## What it'll look like when built
+Generated, and safe to delete — `build_all` rebuilds them:
 
 ```
-core/        corpus loading, chunking, embeddings, vector store, LLM adapter
-kgraph/      relation extraction with provenance, graph traversal
-wikigen/     wiki compiler, lint pass
-approaches/  rag.py, kg.py, wiki.py -- one Answer contract
-app/         FastAPI + vanilla-JS frontend
-scripts/     build_index, build_graph, build_wiki, build_all, ask, lint_wiki
-tests/
+build/                    vectors, chunks, extracted triples
+wiki/                     pages/*.md, index.md, log.md
 ```
+
+## Still to come
+
+The graph tab — a force-directed canvas where the answering path lights up when
+you ask a multi-hop question — plus the wiki browser with a lint button, and a
+sources tab listing all 39 raw documents. `docs/ARCHITECTURE.md` describes what
+each of them is for.
 
 ## License
 
