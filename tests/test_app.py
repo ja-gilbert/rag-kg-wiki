@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 
 from app.main import create_app, scoreboard
 from core.config import load_config
+from kgraph.ontology import Ontology
 from scripts.build_all import build_all
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -343,16 +344,86 @@ def test_every_endpoint_the_page_calls_actually_exists(client):
     # There is no build step, so nothing else checks that the frontend and the
     # API still agree. Renaming a route without renaming its caller would
     # otherwise only show up as a blank column in front of an audience.
-    script = (STATIC / "app.js").read_text(encoding="utf-8")
-    called = set(re.findall(r"[\"'`](/api/[a-z_]+)", script))
+    called: set[str] = set()
+    for script in sorted(STATIC.glob("*.js")):
+        called |= set(re.findall(r"[\"'`](/api/[a-z_]+)", script.read_text(encoding="utf-8")))
     routes = {getattr(r, "path", "") for r in client.app.routes}
-    assert called, "no API calls found in app.js -- has the fetch style changed?"
+    assert called, "no API calls found in app/static -- has the fetch style changed?"
     assert called <= routes, called - routes
 
 
+def test_every_script_the_page_loads_is_actually_served(client):
+    # Load order is this frontend's entire dependency system: graph.js reads
+    # globals that app.js and layout.js define. A script referenced but not
+    # served fails silently in the console and takes a tab down with it.
+    body = client.get("/").text
+    referenced = re.findall(r'<script src="(/static/[^"]+)"', body)
+    assert referenced, "the page loads no scripts at all"
+    for path in referenced:
+        assert client.get(path).status_code == 200, path
+
+
 def test_the_page_declares_the_tabs_that_are_still_to_come(client):
-    # Compare is built; the other three are marked as unbuilt rather than
-    # quietly missing, so the shape of the finished UI is visible.
+    # Compare and graph are built; the other two are marked as unbuilt rather
+    # than quietly missing, so the shape of the finished UI is visible.
     body = client.get("/").text
     for panel in ("compare", "graph", "wiki", "sources"):
         assert f'data-panel="{panel}"' in body
+
+
+# --------------------------------------------------------------------------
+# the graph tab
+# --------------------------------------------------------------------------
+
+
+def test_the_graph_tab_is_built_and_has_somewhere_to_draw(client):
+    body = client.get("/").text
+    assert '<button class="tab" data-panel="graph">' in body, "the graph tab is still disabled"
+    assert 'id="panel-graph"' in body
+    for anchor in ('id="graph-canvas"', 'id="inspect"', 'id="legend"', 'id="lit-routes"'):
+        assert anchor in body, anchor
+
+
+def test_every_entity_type_in_the_ontology_has_a_colour_in_both_themes():
+    # The canvas colours nodes by type by reading a custom property back out of
+    # the stylesheet, so a type the ontology grows and the CSS does not know
+    # about renders grey with nothing to say it went wrong. Both themes,
+    # because a light-only palette is invisible to half the audience.
+    css = (STATIC / "app.css").read_text(encoding="utf-8")
+    light, dark = css.split("prefers-color-scheme: dark", 1)
+    for entity_type in Ontology.load(ROOT / "data" / "ontology.yaml").entity_types:
+        declared = f"--t-{entity_type.lower()}:"
+        assert declared in light, f"{entity_type} has no colour"
+        assert declared in dark, f"{entity_type} has no dark-theme colour"
+
+
+def test_the_answering_path_names_edges_that_are_really_in_the_graph(answered, client):
+    """The acceptance criterion for this step, checked where it can be checked.
+
+    Lighting the path up is a browser's job, but *which* edges to light is a
+    contract between two endpoints: the graph tab corrects each hop for the
+    direction it was walked and looks the result up among the served edges. If
+    that key ever stops matching, the multi-hop question -- the one moment the
+    whole demo exists for -- silently lights nothing.
+    """
+    edges = {
+        (edge["source"], edge["predicate"], edge["target"])
+        for edge in client.get("/api/graph").json()["edges"]
+    }
+    nodes = {node["id"] for node in client.get("/api/graph").json()["nodes"]}
+
+    kg = next(a for a in answered["answers"] if a["approach"] == "kg")
+    routes = [block for block in kg["evidence"] if block.get("hops")]
+    assert routes, f"{QUESTION!r} was chosen to be multi-hop and returned no route"
+
+    for block in routes:
+        assert set(block["nodes"]) <= nodes
+        for hop in block["hops"]:
+            source, target = (
+                (hop["source"], hop["target"])
+                if hop["forward"]
+                else (hop["target"], hop["source"])
+            )
+            assert (source, hop["predicate"], target) in edges, hop
+            # Non-negotiable #8 again: clicking a lit hop has to reach prose.
+            assert hop["sentence"].strip() and hop["doc_id"]
