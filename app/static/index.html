@@ -21,8 +21,8 @@
 <nav class="tabs" aria-label="Views">
   <button class="tab is-current" data-panel="compare" aria-current="page">Compare</button>
   <button class="tab" data-panel="graph">Graph</button>
-  <button class="tab" data-panel="wiki" disabled title="Arrives in step 9d">Wiki</button>
-  <button class="tab" data-panel="sources" disabled title="Arrives in step 9d">Sources</button>
+  <button class="tab" data-panel="wiki">Wiki</button>
+  <button class="tab" data-panel="sources">Sources</button>
 </nav>
 
 <main>
@@ -94,8 +94,8 @@
       <ol class="lit__routes" id="lit-routes"></ol>
     </section>
 
-    <div class="graph">
-      <div class="graph__stage">
+    <div class="split">
+      <div class="stage graph__stage">
         <div class="graph__bar">
           <ul class="legend" id="legend" aria-label="Entity types"></ul>
           <span class="graph__count" id="graph-count"></span>
@@ -111,6 +111,43 @@
     </div>
 
   </section>
+
+  <section class="panel" id="panel-wiki">
+
+    <!-- The lint pass, above the wiki it is keeping coherent. Run on demand
+         rather than on load: it is one of the three operations the approach is
+         built from, and pressing it yourself is the point. -->
+    <section class="lint">
+      <div class="lint__bar">
+        <h2 class="eyebrow">The lint pass — what stops a compiled wiki rotting</h2>
+        <span class="lint__verdict" id="lint-verdict">not run yet</span>
+        <button type="button" class="ghost" id="lint-run">Run lint</button>
+      </div>
+      <div class="lint__findings" id="lint-findings"></div>
+    </section>
+
+    <!-- How the wiki approach reached its answer: what the index matched, and
+         what it then followed. The wiki's equivalent of the graph's route. -->
+    <section class="lit" id="read" hidden>
+      <h2 class="eyebrow">The pages the wiki read for <span class="lit__question" id="read-question"></span></h2>
+      <div class="read__trail" id="read-trail"></div>
+    </section>
+
+    <div class="split">
+      <article class="stage page" id="page" aria-live="polite"></article>
+      <aside class="inspect" id="catalogue"></aside>
+    </div>
+
+  </section>
+
+  <section class="panel" id="panel-sources">
+
+    <div class="split">
+      <article class="stage raw" id="raw" aria-live="polite"></article>
+      <aside class="inspect" id="doc-index"></aside>
+    </div>
+
+  </section>
 </main>
 
 <dialog class="source" id="source">
@@ -122,12 +159,16 @@
 
 <!-- Order matters and is the whole dependency system. app.js defines the shell
      and the plumbing; layout.js the force simulation; graph.js the tab's state
-     and the pointer handling; the last two read that state to paint the canvas
-     and to fill the panel beside it. No modules, no bundler. -->
+     and the pointer handling, which the next two read to paint the canvas and
+     fill the panel beside it; sources.js owns the document catalogue, which
+     wiki.js borrows to tell a real citation from a parenthesis. No modules,
+     no bundler. -->
 <script src="/static/app.js"></script>
 <script src="/static/layout.js"></script>
 <script src="/static/graph.js"></script>
 <script src="/static/graph-draw.js"></script>
 <script src="/static/graph-panel.js"></script>
+<script src="/static/sources.js"></script>
+<script src="/static/wiki.js"></script>
 </body>
 </html>

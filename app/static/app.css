@@ -553,19 +553,27 @@ main { max-width: 1500px; margin: 0 auto; }
 
 /* --- the graph tab ----------------------------------------------------- */
 
-.graph {
+/* Every built tab is the same shape: a stage, and an index of everything that
+   is in it. Three tabs that each invented their own layout would make one app
+   read as three, and the index doubles as the keyboard route into a stage that
+   is otherwise a canvas or a wall of prose. */
+.split {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
   gap: 14px;
   margin-top: 18px;
 }
 
-.graph__stage {
+.stage {
   border: 1px solid var(--rule);
-  border-top: 3px solid var(--kg);
   border-radius: 2px;
   background: var(--panel);
 }
+
+/* The channel rule says whose tab this is. Sources gets none, deliberately:
+   the raw corpus belongs to no approach. */
+.graph__stage { border-top: 3px solid var(--kg); }
+.page { border-top: 3px solid var(--wiki); }
 
 .graph__bar {
   display: flex;
@@ -791,6 +799,176 @@ main { max-width: 1500px; margin: 0 auto; }
 
 .hop:hover { text-decoration: underline; }
 
+/* --- the wiki and sources tabs ----------------------------------------- */
+
+.page, .raw {
+  padding: 18px 22px 24px;
+  max-height: min(78vh, 780px);
+  overflow-y: auto;
+}
+
+.stage__kind {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stage__title { margin: 2px 0 0; font-size: 21px; }
+
+.stage__id {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.page__summary {
+  margin: 8px 0 0;
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.page__section {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Deliberately not a flex row. The `[[links]]` are inline controls sitting in
+   running prose, and a flex container turns every run of text between two of
+   them into its own item -- which breaks a sentence into blocks and strands
+   the full stop on a line of its own. Normal inline flow, with the line height
+   opened up to give the chips somewhere to sit. */
+.page__line {
+  margin: 0 0 6px;
+  max-width: 76ch;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.page__line .entity,
+.page__line .doc { vertical-align: baseline; }
+
+/* The compiler writes bullets; they stay bullets. Reflowing them into
+   paragraphs here would show the reader a tidier wiki than the one on disk. */
+.page__line--bullet::before {
+  content: "·";
+  color: var(--muted);
+  margin-right: 5px;
+}
+
+.page__none { margin: 0; color: var(--muted); font-size: 13px; }
+
+/* The raw document, unreflowed. Three header lines and then prose, exactly as
+   it sits in data/raw -- this tab exists so that claim can be checked. */
+.raw__text {
+  margin: 14px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.entity[data-current="true"] {
+  border-color: var(--ink);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* --- the lint pass ------------------------------------------------------ */
+
+.lint {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--wiki);
+  border-radius: 2px;
+  background: var(--panel);
+}
+
+.lint__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.lint .eyebrow { margin: 0; text-transform: none; letter-spacing: 0.04em; }
+
+.lint__verdict {
+  margin-left: auto;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.lint__verdict[data-ok="false"] { color: var(--flag); }
+
+.lint__findings:not(:empty) { margin-top: 12px; }
+
+.lint__check {
+  padding: 9px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.lint__name {
+  margin: 0 0 4px;
+  color: var(--flag);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+/* Warnings and errors differ in weight, not in hue. The warm flag colour is
+   this palette's one signal for "look at this", and a demo that turned lint
+   findings red would be calling a feature a fault. */
+.lint__check[data-severity="error"] .lint__name { font-weight: 700; }
+
+.lint__check ul {
+  margin: 0;
+  padding: 0 0 0 2px;
+  list-style: none;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.lint__check li { padding: 2px 0; }
+
+.lint__subject {
+  margin-right: 7px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.lint__clean { margin: 0; color: var(--muted); font-size: 13px; }
+
+/* --- what the wiki read ------------------------------------------------- */
+
+.read__trail { display: flex; flex-direction: column; gap: 8px; }
+
+.read__step { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+
+.read__label {
+  flex: none;
+  min-width: 16ch;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.read__count {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
 /* --- the raw source, one click from any citation ----------------------- */
 
 .source {
@@ -841,7 +1019,7 @@ main { max-width: 1500px; margin: 0 auto; }
   .columns { grid-template-columns: 1fr; }
   .metric { grid-template-columns: 1fr; gap: 6px; }
   .metric__label { font-size: 12px; }
-  .graph { grid-template-columns: 1fr; }
-  .inspect { max-height: none; }
+  .split { grid-template-columns: 1fr; }
+  .inspect, .stage { max-height: none; }
   #graph-canvas { height: 58vh; }
 }
