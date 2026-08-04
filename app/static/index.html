@@ -20,7 +20,7 @@
 
 <nav class="tabs" aria-label="Views">
   <button class="tab is-current" data-panel="compare" aria-current="page">Compare</button>
-  <button class="tab" data-panel="graph" disabled title="Arrives in step 9c">Graph</button>
+  <button class="tab" data-panel="graph">Graph</button>
   <button class="tab" data-panel="wiki" disabled title="Arrives in step 9d">Wiki</button>
   <button class="tab" data-panel="sources" disabled title="Arrives in step 9d">Sources</button>
 </nav>
@@ -83,6 +83,34 @@
     </section>
 
   </section>
+
+  <section class="panel" id="panel-graph">
+
+    <!-- The route the graph walked, above the picture of it. Rendered whether
+         or not there is one: "no path" is the answer to a question about
+         something outside the corpus, and this is where that reads clearest. -->
+    <section class="lit" id="lit" hidden>
+      <h2 class="eyebrow">The route the graph walked for <span class="lit__question" id="lit-question"></span></h2>
+      <ol class="lit__routes" id="lit-routes"></ol>
+    </section>
+
+    <div class="graph">
+      <div class="graph__stage">
+        <div class="graph__bar">
+          <ul class="legend" id="legend" aria-label="Entity types"></ul>
+          <span class="graph__count" id="graph-count"></span>
+          <button type="button" class="ghost" id="graph-reset">Re-lay out</button>
+        </div>
+        <canvas id="graph-canvas" role="img"></canvas>
+        <p class="graph__hint">
+          Click a node for its facts, an edge for the sentence it was extracted from.
+          Drag a node to pin it where you want it.
+        </p>
+      </div>
+      <aside class="inspect" id="inspect" aria-live="polite"></aside>
+    </div>
+
+  </section>
 </main>
 
 <dialog class="source" id="source">
@@ -92,6 +120,14 @@
   <pre class="source__text"></pre>
 </dialog>
 
+<!-- Order matters and is the whole dependency system. app.js defines the shell
+     and the plumbing; layout.js the force simulation; graph.js the tab's state
+     and the pointer handling; the last two read that state to paint the canvas
+     and to fill the panel beside it. No modules, no bundler. -->
 <script src="/static/app.js"></script>
+<script src="/static/layout.js"></script>
+<script src="/static/graph.js"></script>
+<script src="/static/graph-draw.js"></script>
+<script src="/static/graph-panel.js"></script>
 </body>
 </html>
