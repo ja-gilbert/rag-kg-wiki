@@ -966,8 +966,12 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
   background: var(--channel);
 }
 
+/* Both tabs use `.lit` for "here is how this approach reached its answer", so
+   the rail has to follow the tab it is sitting on rather than the class name.
+   A violet rail on the wiki tab would be the page telling you the graph did
+   the work. */
 .lit { --channel: var(--kg); }
-.lint { --channel: var(--wiki); }
+#read, .lint { --channel: var(--wiki); }
 
 .lit .eyebrow { margin-bottom: 10px; text-transform: none; letter-spacing: 0.04em; }
 .lit__question { color: var(--ink); }
