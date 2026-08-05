@@ -19,6 +19,33 @@ const METRICS = [
   { key: "admitted_ignorance", label: "Said what it did not know", kind: "mark" },
 ];
 
+/* The bench at rest: what each architecture built out of the same corpus,
+   before anybody has asked it anything. Read off /api/status rather than
+   written down here -- these numbers are the artefacts themselves, and a
+   hardcoded one is the first thing a viewer would be right to disbelieve.
+   Keyed by approach name, drawn in the order the server lists them, which is
+   the order the answer columns use too. */
+const BAYS = {
+  rag: (s) => ({
+    built: s.documents,
+    unit: "documents embedded",
+    how: `Every document cut into ${s.config.chunking} chunks and embedded. Finds the `
+       + `${s.config.rag_top_k} nearest to your question by cosine distance.`,
+  }),
+  kg: (s) => ({
+    built: s.edges,
+    unit: "relations extracted",
+    how: `Typed edges read out of the prose, each carrying the sentence it came from. `
+       + `Walks up to ${s.config.kg_max_hops} hops to join facts no single document holds.`,
+  }),
+  wiki: (s) => ({
+    built: s.pages,
+    unit: "pages compiled",
+    how: `Sources compiled once into cross-linked markdown. Reads the index like a `
+       + `contents page, then follows up to ${s.config.wiki_max_pages} of them.`,
+  }),
+};
+
 const state = { asking: false };
 
 // --- boot -------------------------------------------------------------------
@@ -27,6 +54,7 @@ async function boot() {
   const status = await getJSON("/api/status");
   renderConfig(status);
   renderBanner(status);
+  renderBays(status);
 
   const { questions } = await getJSON("/api/questions");
   renderDemos(questions, status.ready);
@@ -97,6 +125,23 @@ function renderBanner(status) {
     document.createTextNode(", then reload this page. The sources below the fold still work.")
   );
   banner.hidden = false;
+}
+
+function renderBays(status) {
+  const list = el("bays");
+  for (const approach of status.approaches) {
+    const describe = BAYS[approach.name];
+    if (!describe) continue;
+
+    const spec = describe(status);
+    const node = el("bay-template").content.cloneNode(true);
+    node.querySelector(".bay").dataset.approach = approach.name;
+    q(node, ".bay__label").textContent = approach.label;
+    q(node, ".bay__built").textContent = String(spec.built);
+    q(node, ".bay__unit").textContent = spec.unit;
+    q(node, ".bay__how").textContent = spec.how;
+    list.append(node);
+  }
 }
 
 function renderDemos(questions, ready) {

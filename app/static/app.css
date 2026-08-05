@@ -349,12 +349,83 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
   background: var(--channel, var(--muted));
 }
 
-.empty {
+/* --- the bench at rest -------------------------------------------------- */
+
+/* The empty state is the hero. Three bays, in the order they will always
+   appear, each reporting what its architecture built out of the same corpus --
+   so the page says something true before it has been asked anything, and the
+   colour key is taught where a reader actually starts. Cloned from one
+   template for the same reason the answer columns are: non-negotiable #6 holds
+   by construction, not by discipline. */
+.empty { margin: 34px 0 0; }
+
+.bays {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 26px;
+  padding: 0;
+  list-style: none;
+}
+
+.bay {
+  position: relative;
+  padding: 20px 20px 22px 24px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.bay__label {
+  margin: 0;
+  color: var(--channel);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bay__built {
+  display: block;
+  margin: 12px 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.bay__unit {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bay__how {
+  margin: 14px 0 0;
+  padding-top: 13px;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--fs-md);
+  text-wrap: pretty;
+}
+
+.empty__note {
   max-width: 66ch;
-  margin: 34px 0 0;
+  margin: 0;
   color: var(--muted);
   font-size: var(--fs-md);
 }
+
+.bay[data-approach="rag"]  { --channel: var(--rag); }
+.bay[data-approach="kg"]   { --channel: var(--kg); }
+.bay[data-approach="wiki"] { --channel: var(--wiki); }
 
 /* --- columns ----------------------------------------------------------- */
 
@@ -380,7 +451,7 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
 
 /* The channel rail. Full height rather than a 3px cap: it is the instrument's
    colour, and it should run the length of the instrument. */
-.column::before {
+.bay::before, .column::before {
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
