@@ -40,10 +40,29 @@
       <ul class="demos__list" id="demos"></ul>
     </section>
 
-    <p class="empty" id="empty">
-      Pick a question, or write your own. Every demo question is here because it makes one
-      architecture look good and at least one other look bad, for a reason you can explain.
-    </p>
+    <!-- The bench at rest. Before it has been asked anything the page still has
+         something true to say: what each architecture built out of the same
+         corpus. It also teaches the colour key where a reader actually starts,
+         which nothing else on the page was doing. -->
+    <section class="empty" id="empty">
+      <h2 class="eyebrow">Three instruments, one corpus &mdash; what each of them built</h2>
+      <ul class="bays" id="bays"></ul>
+      <p class="empty__note">
+        Pick a question, or write your own. Every demo question is here because it makes one
+        architecture look good and at least one other look bad, for a reason you can explain.
+      </p>
+    </section>
+
+    <!-- Same discipline as the answer columns below: one template, cloned per
+         approach, so a bay added for one is a bay added for all three. -->
+    <template id="bay-template">
+      <li class="bay">
+        <p class="bay__label"></p>
+        <p class="bay__built"></p>
+        <p class="bay__unit"></p>
+        <p class="bay__how"></p>
+      </li>
+    </template>
 
     <!-- One template, rendered three times. The columns are structurally
          identical by construction rather than by discipline: a section added
